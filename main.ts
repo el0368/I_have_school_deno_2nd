@@ -72,6 +72,14 @@ app.get("*", async (ctx) => {
       return ctx.next();
     }
 
+    // Define the KaTeX stylesheet to ensure math formulas render correctly
+    const KaTeXStyle = () =>
+      h("link", {
+        rel: "stylesheet",
+        href: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css",
+        crossorigin: "anonymous",
+      });
+
     /**
      * 2. LAYOUT FLEXIBILITY
      * We render the MDX content directly.
@@ -79,11 +87,14 @@ app.get("*", async (ctx) => {
      */
     if (path.startsWith("/learn/")) {
       return ctx.render(
-        h(CurriculumLayout, { path, children: h(MDXContent, null) }),
+        h(CurriculumLayout, {
+          path,
+          children: h("div", null, h(KaTeXStyle, null), h(MDXContent, null)),
+        }),
       );
     }
 
-    return ctx.render(h(MDXContent, null));
+    return ctx.render(h("div", null, h(KaTeXStyle, null), h(MDXContent, null)));
   } catch (e) {
     /**
      * 3. FATAL ERROR REPORTING

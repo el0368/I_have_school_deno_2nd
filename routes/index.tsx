@@ -1,34 +1,43 @@
-import { signal } from "@preact/signals";
 import { Head } from "fresh/runtime";
 import { define } from "../utils.ts";
-import Counter from "../islands/Counter.tsx";
 
-export default define.page(function Home(ctx) {
-  const count = signal(3);
-
-  console.log("Shared value " + ctx.state.shared);
-
+export default define.page(function Home() {
   return (
-    <div class="home-container fresh-gradient">
+    <>
       <Head>
-        <title>Fresh counter</title>
+        <title>Sovereign Academy | Math Curriculum</title>
       </Head>
-      <div class="hero-section">
-        <img
-          class="logo"
-          src="/logo.svg"
-          width="128"
-          height="128"
-          alt="the Fresh logo: a sliced lemon dripping with juice"
-        />
-        <h1 class="hero-title">Welcome to Fresh</h1>
-        <p class="hero-text">
-          Try updating this message in the
-          <code class="code-snippet">./routes/index.tsx</code>{" "}
-          file, and refresh.
+      <div class="hero-wrapper">
+        <h1 class="hero-large-title">
+          Master Mathematics.<br />
+          <span style="color: var(--color-primary-light);">
+            Own Your Education.
+          </span>
+        </h1>
+        <p class="hero-large-subtitle">
+          A truly offline-first, comprehensive K-12 math curriculum designed for
+          deep intuition and independent learning.
         </p>
-        <Counter count={count} />
+
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+          <a
+            href="/curriculum/math"
+            class="btn-primary"
+            style="font-size: 1.125rem; padding: 0.75rem 2rem; border-radius: 9999px; text-decoration: none;"
+          >
+            Enter Math Academy
+          </a>
+        </div>
       </div>
-    </div>
+
+      <div
+        class="page-container"
+        style="text-align: center; padding-top: 4rem; padding-bottom: 4rem;"
+      >
+        <h2 style="font-size: 1.5rem; color: var(--color-text-muted); font-weight: 500;">
+          Built with WebAssembly and Modern Web Tech
+        </h2>
+      </div>
+    </>
   );
 });
