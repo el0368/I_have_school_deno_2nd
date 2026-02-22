@@ -1,13 +1,24 @@
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
-
-# Fresh build directory
+# Deno / Fresh
 _fresh/
-# npm + other dependencies
+deno.lock
+
+# Node / Vite
 node_modules/
+dist/
 vendor/
 
+# Rust / WASM
+wasm/target/
+wasm/pkg/
+
+# IDE / System
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+.gemini/
+
+# Environment
+.env
+.env.*
+!.env.example
