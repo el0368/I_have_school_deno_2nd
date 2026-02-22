@@ -1,0 +1,183 @@
+================================================================================
+MODULE 2: FRESH & ISLANDS ARCHITECTURE
+================================================================================
+Estimated Time: 40 minutes
+Learning Objectives:
+  - Understand how Fresh differs from Next.js, Remix, and SvelteKit
+  - Know exactly what happens during a page request in Fresh
+  - Deeply understand the Islands Architecture and when to use it
+  - Understand Preact Signals and how they work in islands
+  - Know how components, islands, and routes relate to each other
+================================================================================
+
+--------------------------------------------------------------------------------
+LESSON 1: WHAT IS FRESH AND HOW DOES IT FIT IN THE ECOSYSTEM?
+--------------------------------------------------------------------------------
+Fresh is a full-stack web framework for Deno. It is built by the Deno team.
+Fresh 2.x (what this project uses) was a major redesign that added Vite support,
+making development significantly faster and more flexible.
+
+COMPARISON WITH OTHER FRAMEWORKS:
+
+  Framework     Runtime   Default Rendering   JS to Browser
+  ------------  --------  ------------------  ---------------
+  Next.js       Node.js   SSR + Client Hydra  Large bundle
+  Remix         Node.js   SSR + Full Hydra     Large bundle
+  SvelteKit     Node.js   SSR + Partial Hydra  Medium bundle
+  Astro         Node.js   SSR + Islands        Small bundle
+  Fresh 2.x     Deno      SSR + Islands        ZERO (by default)
+
+Fresh's key philosophy: "Ship HTML. Ship JavaScript only where interaction
+is required." This is called Partial Hydration or the Islands Architecture.
+
+--------------------------------------------------------------------------------
+LESSON 2: SERVER-SIDE RENDERING (SSR) — WHAT ACTUALLY HAPPENS
+--------------------------------------------------------------------------------
+Let's trace EXACTLY what happens when you go to http://localhost:5174/
+
+STEP 1: Your browser sends a GET request to the Fresh/Vite server.
+
+STEP 2: Deno receives the request. Fresh's router matches the URL `/` to
+        the file `routes/index.tsx`.
+
+STEP 3: Fresh calls your default export function (the Preact component).
+        This runs ENTIRELY ON THE SERVER.
+        Preact renders your component tree to a string of HTML.
+        Example output: "<html><body><h1>Hello World</h1></body></html>"
+
+STEP 4: Fresh wraps this in the `_app.tsx` layout (which adds <head>, <meta>,
+        CSS links etc.) and sends the final complete HTML to the browser.
+
+STEP 5: The browser receives the HTML and displays it IMMEDIATELY.
+        There is NO waiting for JavaScript to load.
+
+STEP 6 (only for Islands): For any Island components on the page, Fresh adds
+        small <script> tags pointing only to those specific Island JS files.
+        The browser downloads and runs these to "hydrate" the Islands.
+
+KEY INSIGHT: Steps 1-5 work for 100% of your pages. Step 6 only applies to the
+especially interactive parts. Everything else is static and instant.
+
+--------------------------------------------------------------------------------
+LESSON 3: THE ISLANDS ARCHITECTURE — A VISUAL EXPLANATION
+--------------------------------------------------------------------------------
+Here is an ASCII art diagram of a Fresh page with Islands:
+
+  +-----------------------------------------------------------+
+  |  BROWSER VIEW: /testmdx                                   |
+  |                                                           |
+  |  +--------------------- STATIC HTML ----------------+    |
+  |  |  # Test Page                                      |    |
+  |  |  This is a test MDX page.                        |    |
+  |  |  Why do programmers prefer dark mode?             |    |
+  |  |  Because light attracts bugs.                     |    |
+  |  |                                                   |    |
+  |  |  E = mc² (rendered by KaTeX - still static HTML)  |    |
+  |  +---------------------------------------------------+    |
+  |                                                           |
+  |  +---------- ISLAND (Hydrated with JS) -------------+    |
+  |  |  [ -1 ]    3    [ +1 ]  <- Counter component     |    |
+  |  |  ^ This part IS interactive. JS was loaded here. |    |
+  |  +---------------------------------------------------+    |
+  |                                                           |
+  |  +--------------------- STATIC HTML ----------------+    |
+  |  |  Footer content, links, etc.                      |    |
+  |  +---------------------------------------------------+    |
+  +-----------------------------------------------------------+
+
+In this example:
+  - The text, headings, and math are STATIC. No JS for them.
+  - Only the Counter is Interactive. Only Counter's JS is loaded.
+  - Total JavaScript sent = only the Counter component (~2KB).
+    vs a typical Next.js app that might send 150KB+ for the same page.
+
+--------------------------------------------------------------------------------
+LESSON 4: THE COMPONENT FOLDERS — components/ vs islands/ vs routes/
+--------------------------------------------------------------------------------
+This is the most important distinction to understand in Fresh.
+
+  FOLDER: routes/
+  Role: PAGES. Each file here is a URL.
+  Rendering: 100% Server-Side. No JS sent to browser from here.
+  Use for: Layouts, page content, static text, headings.
+  Can contain: Both static Components AND Islands.
+  File types: .tsx, .mdx, .ts (for API routes)
+
+  FOLDER: components/
+  Role: REUSABLE UI PIECES (non-interactive).
+  Rendering: 100% Server-Side. Outputs pure HTML.
+  Use for: Cards, headers, footers, badges, layout wrappers.
+  CANNOT use: useState, useSignal, useEffect, onClick (no interactivity!)
+  File types: .tsx
+
+  FOLDER: islands/
+  Role: INTERACTIVE WIDGETS.
+  Rendering: Server-Side HTML + Client-Side JavaScript hydration.
+  Use for: Counters, forms, modals, dropdowns, live search, anything with state.
+  CAN use: useState, useSignal, useEffect, onClick, all browser APIs.
+  File types: .tsx
+  Important: Must have a `default` export.
+
+QUICK DECISION TREE:
+  Does the component respond to user actions (click, type, hover effects)?
+    NO  -> components/
+    YES -> Does it only show/hide CSS? (pure CSS hover)
+              YES -> components/ (use CSS :hover)
+              NO  -> islands/ (needs JS state)
+
+--------------------------------------------------------------------------------
+LESSON 5: PREACT & PREACT SIGNALS — STATE MANAGEMENT IN ISLANDS
+--------------------------------------------------------------------------------
+Preact is used as the UI library in Fresh. It is virtually identical to React
+but weighs only ~3KB instead of React's ~45KB.
+
+For state management in Islands, this project uses PREACT SIGNALS.
+Signals are reactive values. When a signal's value changes, any component
+that reads that signal AUTOMATICALLY re-renders. 
+
+Creating a signal:
+  import { signal } from "@preact/signals";
+  const count = signal(0);  // initial value is 0
+
+Reading a signal's value:
+  console.log(count.value);  // prints 0
+
+Updating a signal's value:
+  count.value += 1;          // Automatically updates any UI using `count`
+
+Signals vs useState:
+  React/Preact `useState` is a HOOK. Hooks can ONLY be called inside a component
+  function body. You CANNOT call useState at the top level of an MDX file.
+
+  Signals are just OBJECTS. You can create them anywhere - at the module level,
+  inside a component, or at the top level of an MDX file.
+  This is why in `routes/testmdx.mdx` we use:
+    export const count = signal(3);   <-- This is fine at module level
+  Instead of:
+    const [count, setCount] = useSignal(3);  <-- This would CRASH in MDX
+
+  There is also `useSignal` which is the hook version (only inside components):
+    function MyIsland() {
+      const count = useSignal(0);  // Only valid inside a component function
+    }
+
+--------------------------------------------------------------------------------
+QUIZ TIME!
+--------------------------------------------------------------------------------
+Q1: A user visits your page. Where does your Preact component code run first?
+A1: On the SERVER (Deno). The component renders to HTML before any browser
+    involvement.
+
+Q2: Why does Fresh send ZERO JavaScript by default?
+A2: Because SSR generates complete HTML. The browser doesn't need JS to display
+    static HTML. JavaScript is only added for Islands (interactive components).
+
+Q3: You have a component that shows the current user's name from a database.
+    It doesn't need any interactivity. Where does it go?
+A3: `components/` - It is static output, rendered on the server.
+
+Q4: What is the difference between `signal(0)` and `useSignal(0)`?
+A4: `signal(0)` creates a global signal object - can be used anywhere.
+    `useSignal(0)` is a Preact hook - can ONLY be called inside a component.
+
+Next up: Module 3 - Routing & MDX Magic!

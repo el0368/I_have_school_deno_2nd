@@ -1,0 +1,48 @@
+================================================================================
+MDX: THE "SECRET CONVERSION"
+================================================================================
+
+You asked: *"What does mdx-routes.ts convert it to?"*
+
+The answer is: **It converts MDX into a JavaScript Module (Preact Component).**
+
+Here is the step-by-step technical journey:
+
+--------------------------------------------------------------------------------
+STEP 1: THE RAW FILE
+--------------------------------------------------------------------------------
+You write `rust-wasm2.mdx`. At this point, it is just a text file with 
+Markdown and some JSX tags.
+
+--------------------------------------------------------------------------------
+STEP 2: THE REGISTRY (mdx-routes.ts)
+--------------------------------------------------------------------------------
+You add the path to `mdx-routes.ts`. This tells Vite: 
+"Hey, this file is important! Include it in the final build."
+
+--------------------------------------------------------------------------------
+STEP 3: THE COMPILATION (Vite + @mdx-js/rollup)
+--------------------------------------------------------------------------------
+When you start the server, **Vite** sees the `.mdx` file and "translates" it. 
+It literally rewrites your Markdown into a JavaScript function.
+
+Example:
+`# Hello`  becomes  `h("h1", null, "Hello")`
+
+--------------------------------------------------------------------------------
+STEP 4: THE EXECUTION (main.ts)
+--------------------------------------------------------------------------------
+When you visit the page, the code in `main.ts` does this:
+1. Loads the "translated" JavaScript module from the registry.
+2. Gets the `default` export (which is now a Preact function).
+3. Renders that function just like it was a normal `.tsx` component.
+
+--------------------------------------------------------------------------------
+SUMMARY:
+- `.tsx` is "Native" (Fresh already knows how to run it).
+- `.mdx` is "Compiled" (Our registry tells Vite to turn it into a .tsx-like 
+  function behind the scenes).
+
+So, by the time it reaches your screen, **MDX has become a Preact Component**, 
+just like your `.tsx` files!
+================================================================================

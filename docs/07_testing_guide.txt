@@ -1,0 +1,98 @@
+================================================================================
+TESTING GUIDE FOR FRESH 2.X + DENO
+================================================================================
+
+This project uses the Deno runtime, which includes a fast, native test runner.
+Testing ensures that your routes, islands, and logic remain stable as you build.
+
+--------------------------------------------------------------------------------
+1. RESOLVING "NO TEST MODULES FOUND"
+--------------------------------------------------------------------------------
+
+When you see "error: No test modules found", it means Deno cannot find any files
+matching its expected patterns. By default, Deno looks for these filenames:
+
+* files ending in: _test.ts
+* files ending in: _test.tsx
+* files ending in: .test.ts
+* files ending in: .test.tsx
+
+To fix this, simply name your test files using one of the suffixes above.
+
+--------------------------------------------------------------------------------
+2. RECOMMENDED TESTING STACK
+--------------------------------------------------------------------------------
+
+A. UNIT TESTING (LOGIC AND UTILITIES)
+   Tool: Built-in Deno runner (deno test)
+   Assertions: jsr:@std/assert
+   Usage: Best for pure TypeScript functions in folders like /utils.
+
+B. COMPONENT TESTING (INTERACTIVE ISLANDS)
+   Tool: Preact Testing Library + Happy DOM
+   Purpose: Verifies that components in your /islands folder (like Counter.tsx)
+   respond correctly to clicks, state changes, and property updates.
+   Benefit: Runs in a simulated environment, much faster than a full browser.
+
+C. END-TO-END (E2E) TESTING
+   Tool: Playwright
+   Purpose: Tests the entire system exactly how a user sees it.
+   Checklist for E2E:
+   - Does main.ts correctly load the MDX router?
+   - Does KaTeX math render in the browser?
+   - Does the page transition smoothly between routes?
+
+--------------------------------------------------------------------------------
+3. INSTALLATION COMMANDS
+--------------------------------------------------------------------------------
+
+A. UNIT TESTING
+   No installation required. Deno includes the test runner out of the box.
+
+B. COMPONENT TESTING
+   To add support for testing interactive components, run:
+   deno add npm:@testing-library/preact npm:happy-dom
+
+C. END-TO-END TESTING
+   To add browser-based testing, run:
+   deno add npm:playwright
+
+   Note: Playwright may require a separate step to download browser drivers:
+   npx playwright install
+
+--------------------------------------------------------------------------------
+4. STARTING YOUR FIRST TEST
+--------------------------------------------------------------------------------
+
+To start testing, create a file named "logic.test.ts" in your root folder.
+Copy and paste this code:
+
+--- START OF CODE ---
+import { assertEquals } from "jsr:@std/assert";
+
+Deno.test("basic math validation", () => {
+  assertEquals(2 + 2, 4);
+});
+--- END OF CODE ---
+
+HOW TO RUN:
+Open your terminal and type: deno test
+
+--------------------------------------------------------------------------------
+5. BEST PRACTICES AND CLEANLINESS
+--------------------------------------------------------------------------------
+
+* SEPARATION: Keep logic tests in a "tests/" folder to keep your root clean.
+* NAMING: Always use ".test.ts" so they are excluded from production builds.
+* PERMISSIONS: If your tests need to read files or talk to the network, use:
+  deno test --allow-read --allow-net
+
+--------------------------------------------------------------------------------
+6. TROUBLESHOOTING TIP
+--------------------------------------------------------------------------------
+
+If a test hangs or stays stuck, you can use the --trace-ops flag to see which
+background tasks (like timers or open files) are keeping it open:
+
+deno test --trace-ops sample.test.ts
+================================================================================

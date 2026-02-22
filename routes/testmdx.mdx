@@ -1,0 +1,21 @@
+# Test Page (testmdx.mdx)
+
+This is a test MDX page located in a subdirectory.
+
+### Why do programmers prefer dark mode?
+
+Because light attracts bugs. 🐛
+
+## Math Test
+$E = mc^2$
+
+## Interactive Island Example
+
+import { signal } from "@preact/signals";
+import Counter from "../islands/Counter.tsx";
+
+export const count = signal(3);
+
+Here is an interactive counter island embedded directly into the MDX file:
+
+<Counter count={count} />

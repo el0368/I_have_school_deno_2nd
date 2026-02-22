@@ -1,0 +1,68 @@
+import RustCounter from "../islands/RustCounter.tsx";
+
+# Rust-WASM: The Markdown Version
+
+This page is the **MDX** version of the Rust demo. Notice how much cleaner the 
+source code is compared to the `.tsx` version!
+
+---
+
+## 1. The Interactive Island
+Below is the same Rust engine we used before, but now it is embedded directly 
+into a Markdown document.
+
+<div class="my-8">
+  <RustCounter />
+</div>
+
+---
+
+## 2. Why is this different?
+
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>.tsx (Code Route)</th>
+      <th>.mdx (Content Route)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Primary Goal</strong></td>
+      <td>Application Logic</td>
+      <td>Reading &amp; Writing</td>
+    </tr>
+    <tr>
+      <td><strong>Authoring</strong></td>
+      <td>Harder (HTML tags)</td>
+      <td>Easier (Markdown)</td>
+    </tr>
+    <tr>
+      <td><strong>Routing</strong></td>
+      <td>Automatic in Fresh</td>
+      <td>Manual Registry</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 3. The "Auto" Confusion
+
+You asked: *"Why do I have to register MDX but not TSX?"*
+
+It comes down to who is "driving" the search:
+
+1. **The Framework (Fresh)**: Fresh was built by the Deno team to recognize `.tsx` 
+   files automatically. It's "hard-coded" to love those files.
+   
+2. **Our Extension (MDX)**: Fresh doesn't know what MDX is by default. We added 
+   a "Custom Catch-all" in your `main.ts`. Because we don't want Deno searching 
+   the entire hard drive on every single click (which is slow), we tell it to 
+   check your "Approved List" in `mdx-routes.ts` instead.
+
+**Think of it like this:**
+- `.tsx` is the **Main Entrance** of the building (anyone can walk in).
+- `.mdx` is a **Private Club** (you have to be on the guest list in `mdx-routes.ts`).

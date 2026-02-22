@@ -1,0 +1,45 @@
+================================================================================
+MDX3: HTML + ISLANDS
+================================================================================
+
+You have summarized it perfectly! 
+
+--------------------------------------------------------------------------------
+1. THE CONVERSION
+--------------------------------------------------------------------------------
+
+When Deno looks at your `.mdx` file, it does a "Double Transformation":
+
+1. MDX -> PREACT: It turns your markdown text into a Preact component.
+2. PREACT -> HTML: It renders that component into static HTML on the server.
+
+So, by the time the user's browser sees your page, **the entire MDX file has 
+become a standard HTML page.**
+
+--------------------------------------------------------------------------------
+2. THE "ISLANDS" IN THE STREAM
+--------------------------------------------------------------------------------
+
+Just like a standard HTML page, your MDX-generated page is "dead" by default. 
+It only becomes "alive" if you explicitly drop an Island into it:
+
+- THE PAGE (The Ocean): All your markdown text, headings, and math. 
+  This stays as static, high-performance HTML.
+- THE ISLANDS (The Interactive Parts): Components from the /islands/ folder. 
+  These are the only parts that ship JavaScript to the user.
+
+--------------------------------------------------------------------------------
+3. WHY THIS IS SO COOL
+--------------------------------------------------------------------------------
+
+This means you get the best of both worlds:
+
+- YOU WRITE: Easy markdown text.
+- THE BROWSER LOADS: Fast, static HTML.
+- THE USER GETS: Complex, interactive tools (Islands) right inside the text.
+
+SUMMARY:
+A page created with MDX3 is **100% equivalent** to a page created with a standard 
+`.tsx` file. Both result in a static HTML page where only the "Islands" are 
+interactive.
+================================================================================

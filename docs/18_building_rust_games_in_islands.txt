@@ -1,0 +1,50 @@
+================================================================================
+BUILDING RUST GAMES IN ISLANDS
+================================================================================
+
+You've hit the nail on the head! This is exactly what the Island Architecture 
+is for. You can build a high-performance game in **Rust**, compile it, and 
+run it inside a small section of your page.
+
+--------------------------------------------------------------------------------
+1. THE GAME ARCHITECTURE
+--------------------------------------------------------------------------------
+
+- THE ENGINE (Rust): 
+  Calculates the physics, high-speed logic, and game state.
+- THE RENDERER (Canvas/Webgl): 
+  The area on the screen where the game is drawn.
+- THE HOST (Island): 
+  A Preact Island that sets up the game area and connects the user's 
+  keyboard/mouse to the Rust engine.
+
+--------------------------------------------------------------------------------
+2. HOW IT LOOKS IN YOUR CODE
+--------------------------------------------------------------------------------
+
+Imagine you want a small "Asteroids" game in the middle of a lesson:
+
+1. RUST SIDE: You write your game loops in Rust and compile to `game.wasm`.
+2. ISLAND SIDE: You create `islands/RustGame.tsx`. Inside, you have a 
+   `<canvas id="game-screen"></canvas>`.
+3. THE LINK: The Island's TypeScript code grabs the `<canvas>` and "hands" it 
+   to the Rust WASM module.
+4. THE RESULT: Rust now has total control over that rectangle on your screen!
+
+--------------------------------------------------------------------------------
+3. WHY THIS IS BETTER THAN "TRADITIONAL" WEB GAMES
+--------------------------------------------------------------------------------
+
+- SPEED: Rust is much faster for calculating 100s of moving objects or 
+  complex collisions.
+- ISOLATION: The game runs in its own "Island." If the game is heavy, it 
+  won't slow down the scrolling of the rest of your text/lesson.
+- CONTENT-FIRST: You can write a whole article in MDX, and then just drop in:
+  `<RustGame difficulty="hard" />`
+
+--------------------------------------------------------------------------------
+CONCLUSION:
+Islands are the perfect "cradles" for WASM-powered content like games, 
+scientific simulators, or 3D models. You get the speed of Rust with the 
+easy layout of MDX!
+================================================================================

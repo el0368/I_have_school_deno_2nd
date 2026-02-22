@@ -1,0 +1,51 @@
+================================================================================
+TAURI + FRESH: THE DESKTOP FRONTIER
+================================================================================
+
+You asked: *"Will Tauri work in this project?"*
+
+The short answer is: **Yes, absolutely!** 
+
+In fact, the way we have set up this project (Fresh 2.0 + Vite) makes it MUCH 
+easier to add Tauri than older versions of Fresh. 
+
+--------------------------------------------------------------------------------
+1. HOW IT WOULD WORK
+--------------------------------------------------------------------------------
+Tauri doesn't "replace" your project; it "Wraps" it.
+
+- **The Front (Fresh)**: Your HTML, CSS, and Preact Islands stay exactly as 
+  they are. They become the "Interface" of your desktop app.
+- **The Back (Tauri/Rust)**: Tauri would create a new folder called `src-tauri`. 
+  This is where the "Native" Rust code lives.
+- **The Bridge**: Your current Rust WASM code in `/wasm/` could be moved or 
+  linked so that the desktop app can use it directly without needing the 
+  browser's permission.
+
+--------------------------------------------------------------------------------
+2. WHY FRESH 2.0 + VITE IS A "SECRET WEAPON"
+--------------------------------------------------------------------------------
+Tauri loves **Vite**. Because Fresh 2.0 uses Vite for its build process, 
+connecting Tauri is straightforward. Tauri would simply listen to your 
+`deno task dev` (Vite) server and display it inside a native window.
+
+--------------------------------------------------------------------------------
+3. WHAT WOULD CHANGE?
+--------------------------------------------------------------------------------
+If you added Tauri, you would get new "Superpowers":
+- **File System**: Your schoool app could save files directly to the 
+  user's "My Documents" folder.
+- **Native Menus**: You could have real Windows/Mac menus at the top.
+- **System Tray**: Your app could sit in the taskbar next to the clock.
+- **Performance**: Rust would talk to the CPU directly, not through a 
+  "Guest" (WASM) layer.
+
+--------------------------------------------------------------------------------
+SUMMARY:
+You are in a perfect position to move to Tauri later. 
+- **Website version**: Fresh runs on Deno (Web).
+- **Desktop version**: Fresh runs inside Tauri (Native).
+
+You could literally have the **same code** serve both a website and a 
+downloadable `.exe` file!
+================================================================================

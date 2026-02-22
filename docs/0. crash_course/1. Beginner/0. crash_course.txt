@@ -1,0 +1,90 @@
+================================================================================
+CRASH COURSE: DENO FRESH 2.x + VITE + MDX
+================================================================================
+
+Welcome to the crash course for this project! This guide will get you up to speed 
+with the core concepts, architecture, and tools used in this repository.
+
+--------------------------------------------------------------------------------
+1. THE STACK
+--------------------------------------------------------------------------------
+* Deno: A modern, secure runtime for JavaScript and TypeScript. No node_modules 
+  required by default (though this project uses a manual nodeModulesDir for Vite).
+* Fresh 2.x: A next-generation web framework for Deno. It sends zero JavaScript 
+  to the client by default, resulting in extremely fast page loads.
+* Preact: A fast, 3KB alternative to React with the same modern API (Hooks, etc.).
+* Vite: The build tool and development server, providing lightning-fast Hot 
+  Module Replacement (HMR).
+* MDX3: Markdown for the component era. It lets you write Markdown with embedded 
+  interactive JSX/TSX components.
+
+--------------------------------------------------------------------------------
+2. PROJECT STRUCTURE
+--------------------------------------------------------------------------------
+* /routes/     : File-system based routing. Every .tsx or .mdx file here becomes 
+                 a page on your website.
+* /islands/    : Interactive Preact components. These are the ONLY components 
+                 that ship JavaScript to the browser.
+* /components/ : Static, server-rendered Preact components. They output pure HTML 
+                 and do not run JavaScript in the browser.
+* /docs/       : Project documentation and guides.
+* /static/     : Static assets like images, fonts, or raw CSS files.
+
+--------------------------------------------------------------------------------
+3. ROUTING & MDX
+--------------------------------------------------------------------------------
+Fresh uses file-system routing based on the `routes/` folder.
+
+* `routes/index.tsx` -> Maps to `/` (Homepage)
+* `routes/about.tsx` -> Maps to `/about`
+* `routes/api/[name].tsx` -> Dynamic route, maps to `/api/anything`
+
+MDX Auto-Routing:
+This project is specially configured to support native MDX routing.
+* `routes/hello.mdx` -> Maps to `/hello`
+You can write standard Markdown in these files, and even import and use Preact 
+components directly inside the Markdown!
+
+--------------------------------------------------------------------------------
+4. THE "ISLANDS" ARCHITECTURE
+--------------------------------------------------------------------------------
+Fresh uses the "Islands of Hydration" architecture. 
+By default, everything in `routes/` and `components/` is rendered on the server 
+and sent to the browser as pure, static HTML. No JavaScript is sent.
+
+When you need interactivity (like a button click, a counter, or a form), you 
+create an "Island" in the `islands/` folder. 
+* Islands are hydrated (made interactive) on the client side.
+* Use Islands sparingly to keep your application fast.
+* Rule of thumb: If it doesn't need `useState`, `useEffect`, or DOM event 
+  listeners (like `onClick`), put it in `components/`. If it does, put it in 
+  `islands/`.
+
+--------------------------------------------------------------------------------
+5. COMMANDS (from deno.json)
+--------------------------------------------------------------------------------
+Run these commands in your terminal using Deno:
+
+* `deno task dev`   : Starts the Vite development server with Hot Reloading.
+* `deno task build` : Builds the project for production.
+* `deno task start` : Runs the production server (requires building first).
+* `deno task check` : Formats, lints, and type-checks your code.
+
+--------------------------------------------------------------------------------
+6. QUICK START EXAMPLES
+--------------------------------------------------------------------------------
+
+Creating a new static page:
+1. Create `routes/contact.tsx`
+2. Export a default function returning JSX.
+
+Creating a new MDX page:
+1. Create `routes/guide.mdx`
+2. Write markdown: `# My Guide \n This is a guide.`
+
+Creating an interactive component:
+1. Create `islands/MyButton.tsx`
+2. Use `useState` and export the component.
+3. Import and use it inside any file in `routes/`.
+
+Happy coding!
