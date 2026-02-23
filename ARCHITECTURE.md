@@ -1,62 +1,119 @@
 # System Architecture: Sovereign Academy
 
-This document outlines the professional standards and architectural patterns
-used in Sovereign Academy.
+## Overview
 
-## 1. Content Collections (Real-World Standard)
+Sovereign Academy is a **local-first educational platform** built on Fresh 2.x,
+Deno, and Vite. Its core design principle is **Sovereignty** — the application
+can run entirely offline, the student owns their data, and the system is fast
+with zero server-side database requirements.
 
-To manage hundreds of educational lessons without cluttering the application
-logic, we use a **Content Collection** pattern.
+---
 
-- **Content Storage**: All educational material (MDX files) is stored in the
-  `curriculums/` directory.
-- **Data-Driven Routing**: The application does not use physical route files for
-  lessons. Instead, it "discovers" content in `curriculums/` and handles the URL
-  mapping virtually.
-- **Separation of Concerns**: Writers work in `curriculums/`, while developers
-  work in `routes/` and `components/`.
+## 1. Content Collections
+
+All educational content is separated from application logic.
+
+- **Content Storage**: All lessons (MDX files) live in
+  `curriculums/[subject]/[grade]/[unit]/[topic].mdx`.
+- **Routing**: The virtual router handles URL mapping (see below). Do **not**
+  put lesson files in `routes/`.
+- **Separation of Concerns**: Curriculum writers work in `curriculums/`.
+  Developers work in `routes/`, `components/`, and `islands/`.
+
+---
 
 ## 2. The Virtual MDX Router
 
-We utilize a "Bulletproof" virtual routing system to bypass Fresh 2.x
-serialization limitations and provide a unified layout.
+Fresh 2.x has serialization limitations that prevent rendering complex MDX
+components in standard route handlers. We bypass this with a custom virtual
+router.
 
 ### How it works:
 
-1. **Auto-Discovery**: `mdx-routes.ts` uses Vite's `import.meta.glob` to scan
-   the `curriculums/` folder at build time.
-2. **Request Interception**: `main.ts` listens for all requests. Any path
-   starting with `/learn/` is intercepted.
-3. **Server-Side Rendering**: The router finds the matching MDX file, wraps it
-   in the `CurriculumLayout` component, and renders it directly to HTML on the
-   server.
+1. **Auto-Discovery**: `mdx-routes.ts` uses `import.meta.glob` to scan
+   `curriculums/` at build time and build a registry of all MDX modules.
+2. **Interception**: `main.ts` intercepts all HTTP requests whose path starts
+   with `/learn/`.
+3. **SSR**: The router finds the matching MDX module, wraps content in
+   `CurriculumLayout.tsx`, and renders HTML directly on the server.
 
-### Key Benefits:
+### Benefits:
 
-- **No 500 Errors**: Prevents Preact component serialization crashes.
-- **Unified UI**: Sidebar, Breadcrumbs, and "Mark Complete" buttons are defined
-  once in `CurriculumLayout.tsx` and applied to every lesson automatically.
-- **URL Normalization**: Handles trailing slashes (e.g., `/learn/math/` vs
-  `/learn/math`) automatically.
+- Unified layout (sidebar, breadcrumbs) applied to every lesson automatically.
+- No serialization crashes.
+- URL normalization for trailing slashes.
 
-## 3. Data Strategy
+---
 
-We distinguish between **Content** and **Data**:
+## 3. Math Rendering Architecture (Two-Layer)
 
-| Type         | Format     | Location       | Purpose                                  |
-| :----------- | :--------- | :------------- | :--------------------------------------- |
-| **Content**  | MDX        | `curriculums/` | Lessons, textbook text, math equations.  |
-| **Progress** | JSON / SQL | PGlite         | Student scores, mastery levels, history. |
+Math is handled in two separate layers to maximize performance and
+interactivity.
 
-### Offline-First Progress
+### Layer 1: Server-Side Static (MathJax)
 
-Because the app is designed for **Tauri** (Desktop/Mobile), student progress is
-stored locally using **PGlite (WASM PostgreSQL)**. This allows the app to work
-entirely without an internet connection.
+- **Tool**: `rehype-mathjax` (`npm:rehype-mathjax@^7.1.0`)
+- **Configured in**: `vite.config.ts` → MDX plugin `rehypePlugins`
+- **Role**: Reads LaTeX `$...$` and `$$...$$` syntax from MDX files at
+  build/render time and outputs native HTML5 `<math>` (MathML) tags.
+- **Result**: Beautiful, accessible math with zero runtime JavaScript.
 
-## 4. UI Design Philosophy
+### Layer 2: Client-Side Interactive (MathLive)
 
-- **Frameless Window**: Designed for Tauri's custom window controls.
-- **Tailwind CSS**: Used for rapid, consistent styling.
-- **Preact Islands**: Interactivity (like counters or quiz components) is
-  isolated to `islands/` to minimize client-side JavaScript.
+- **Tool**: `mathlive` (`npm:mathlive@^0.108.3`)
+- **Location**: `islands/MathInput.tsx`
+- **Role**: Provides the interactive virtual math keyboard where students type
+  their answers.
+- **Output**: Emits `math-ml` and `latex` strings that can be validated by the
+  Rust WASM engine or stored in PGlite.
+
+---
+
+## 4. Local-First Data Strategy
+
+| Type         | Format | Location              | Purpose                                    |
+| ------------ | ------ | --------------------- | ------------------------------------------ |
+| **Content**  | MDX    | `curriculums/`        | Lesson text, math equations                |
+| **Progress** | SQL    | PGlite (Browser WASM) | Student scores, completion status, mastery |
+
+### PGlite
+
+- **Package**: `@electric-sql/pglite@^0.3.15`
+- **What it is**: Full PostgreSQL compiled to WebAssembly, running inside the
+  browser.
+- **Storage**: Persisted in `IndexedDB` under the key
+  `idb://sovereign-progress`.
+- **Why**: Enables offline-first progress tracking with real SQL query power.
+
+---
+
+## 5. Rust WASM Engine
+
+Complex mathematical validation and scoring logic lives in `wasm/src/lib.rs` and
+is compiled with `wasm-pack`.
+
+- **Source**: `wasm/src/lib.rs`
+- **Output**: `wasm/pkg/` (auto-generated, not committed)
+- **Integration**: Imported by Preact Islands via
+  `import init from "../../wasm/pkg/wasm.js"`.
+- **Rule**: WASM must only be called from `islands/`, never in server-side
+  routes.
+
+---
+
+## 6. UI Design Philosophy
+
+- **Frameless Design**: Designed for Tauri's custom frameless window.
+- **Vanilla CSS**: Global styles in `assets/styles.css`. CSS custom properties
+  (variables) for theming. **No Tailwind CSS**.
+- **Preact Signals**: Reactive state management for islands (`@preact/signals`).
+- **Island Architecture**: Client-side interactivity is isolated to `islands/`
+  to minimize JavaScript bundle size.
+
+---
+
+## 7. Future: Tauri Desktop/Mobile
+
+The application is designed to be packaged with **Tauri 2.0** for native
+distribution on Windows, macOS, iOS, and Android. The CSS is "frameless" and
+platform-agnostic in preparation for this.

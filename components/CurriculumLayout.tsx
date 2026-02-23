@@ -1,4 +1,5 @@
 import { ComponentChildren } from "preact";
+import MarkCompleteButton from "../islands/MarkCompleteButton.tsx";
 
 interface Props {
   children: ComponentChildren;
@@ -63,9 +64,7 @@ export function CurriculumLayout({ children, path }: Props) {
               <div class="path-pill">
                 {path}
               </div>
-              <button class="btn-primary">
-                Mark Complete
-              </button>
+              <MarkCompleteButton lessonId={path} />
             </div>
           </div>
         </main>

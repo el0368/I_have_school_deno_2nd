@@ -1,55 +1,118 @@
 # Contributing to Sovereign Academy
 
-We are building a massive, open-source educational platform. We follow strict
-standards to ensure the project remains fast, accessible, and high-quality.
+Welcome! This guide covers the standards for writing curriculum content and
+developing new application features.
 
-## Adding New Curriculum Content
+> **AI Agents**: Please read `GEMINI.md` and `SKILL.md` before making any
+> changes to this project.
 
-All lessons are written in **MDX3**.
+---
 
-### 1. File Organization
+## Part 1: Writing Curriculum Content
 
-Content lives in the `curriculums/` directory. Structure your content by
-subject, grade, and unit.
+All lessons are written in **MDX3** (Markdown + JSX).
 
-**Structure:** `curriculums/[subject]/[grade]/[unit_folder]/[lesson].mdx`
+### File Organization
 
-**Example:**
-`curriculums/math/grade_1/unit_1_place_value/1_numbers_from_1_to_9.mdx`
+Content lives in `curriculums/`. Structure it by subject, grade, and unit:
 
-### 2. File Naming
+```
+curriculums/
+  math/
+    grade_1/
+      unit_1_place_value/
+        introduction.mdx   ← Unit overview
+        1_numbers.mdx
+        2_counting.mdx
+        quiz.mdx           ← Placed last (non-numbered)
+```
 
-- Use lowercase.
-- Use underscores instead of spaces.
-- Number your lessons to ensure correct order in the sidebar (e.g.,
-  `1_intro.mdx`).
+### File Naming Rules
 
-### 3. Formatting Lessons
+- Use lowercase with underscores: `1_numbers_from_1_to_9.mdx`.
+- Number lessons to control sidebar order: `1_`, `2_`, `3_`.
+- `introduction.mdx` is always shown first.
+- `quiz.mdx` / `test.mdx` are always shown last.
 
-- Use `#` for the main lesson title.
-- Use `##` and `###` for sub-sections.
-- For math, use LaTeX syntax: `$ \frac{1}{2} $` for inline or `$$ ... $$` for
-  blocks.
-- **Rule**: Do not add Layout or Sidebar components manually; the virtual router
-  handles this for you!
+### Writing Math (CRITICAL RULES)
 
-## Developing New Features
+Math is written in LaTeX and converted to MathML automatically by MathJax at
+render time.
+
+- **Inline math**: `$x + y = z$`
+- **Block math**: `$$ax^2 + bx + c = 0$$`
+
+**Forbidden Patterns (cause 500 server errors):**
+
+| ❌ Do NOT write                       | ✅ Write instead                  |
+| ------------------------------------- | --------------------------------- |
+| `$\boxed{?}$`                         | `$\square$`                       |
+| `$\text{answer!}$` with special chars | Plain text outside the `$$` block |
+| `$a<b$` (unpadded `<`)                | `$a < b$`                         |
+| `$25¢$` (Unicode cent)                | `$25 \text{ cents}$`              |
+| `$1\;—\;2$` (em-dash)                 | `$1 \;-\; 2$`                     |
+
+### Adding Interactive Practice
+
+To add a student input box (virtual math keyboard), import the MathLive Island:
+
+```mdx
+import MathInput from "../../islands/MathInput.tsx";
+
+## Practice
+
+Solve: $x + 3 = 7$
+
+<MathInput />
+```
+
+---
+
+## Part 2: Developing New Features
 
 ### Tech Stack
 
-- **Framework**: Fresh 2.x
-- **Engine**: Vite
-- **Styling**: Tailwind CSS
-- **Database**: PGlite (WASM)
+| Layer         | Tool                       |
+| ------------- | -------------------------- |
+| Framework     | Fresh 2.x + Deno           |
+| Bundler       | Vite 7.x                   |
+| UI            | Preact 10.x                |
+| Styling       | Vanilla CSS (no Tailwind)  |
+| Math (SSR)    | MathJax (`rehype-mathjax`) |
+| Math (Client) | MathLive (Islands only)    |
+| Database      | PGlite WASM (Islands only) |
+| WASM Logic    | Rust (`wasm-pack`)         |
 
-### Creating UI Components
+### Where to Put Code
 
-- **Pure CSS/Static**: Use `.tsx` in `components/`.
-- **Interactive**: Use `.tsx` in `islands/`.
-- **Logic**: Favor Rust/WASM for complex data processing.
+| What you're building             | Where it goes           |
+| -------------------------------- | ----------------------- |
+| Static page or layout            | `routes/*.tsx`          |
+| Shared non-interactive component | `components/*.tsx`      |
+| Interactive component (needs JS) | `islands/*.tsx`         |
+| Database / WASM logic            | Inside `islands/*.tsx`  |
+| Lesson content                   | `curriculums/.../*.mdx` |
 
-## Documentation Standards
+### Creating a New Island
 
-- Keep documentation in the `docs/` folder.
-- Use `.md` for formal documentation.
-- Use numbering prefixes to indicate reading order (e.g., `01_intro.md`).
+1. Create `islands/MyFeature.tsx`.
+2. Export a single default Preact component.
+3. Use `useEffect` for side effects (DB reads, WASM calls).
+4. Import and use in an `.mdx` file or a route template.
+
+### Rebuilding Rust WASM
+
+After editing `wasm/src/lib.rs`, run:
+
+```bash
+cd wasm && wasm-pack build --target web
+```
+
+---
+
+## Part 3: Documentation Standards
+
+- Keep all documentation in `docs/` (numbered, e.g., `01_intro.md`).
+- Architecture decisions go in `ARCHITECTURE.md`.
+- Skill instructions for AI go in `SKILL.md`.
+- AI context and rules go in `GEMINI.md`.

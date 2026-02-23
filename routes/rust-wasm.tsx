@@ -1,4 +1,3 @@
-import { h } from "preact";
 import RustCounter from "../islands/RustCounter.tsx";
 
 export default function RustWasmPage() {

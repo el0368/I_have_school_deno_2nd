@@ -20,16 +20,20 @@ export default define.page(async function GradeOverview(ctx) {
           }
         }
 
-        // Sort topics numerically based on the leading number (e.g., "1_topic" -> 1)
+        // Sort topics: introductions first, then numbered, then quizzes last
         topics.sort((a, b) => {
-          const matchA = a.match(/^(\d+)/);
-          const matchB = b.match(/^(\d+)/);
+          const getWeight = (name: string) => {
+            if (name.includes("introduction")) return -1;
+            if (name.includes("quiz") || name.includes("test")) return 1000;
+            const match = name.match(/^(\d+)/);
+            return match ? parseInt(match[1]) : 999;
+          };
 
-          const numA = matchA ? parseInt(matchA[1]) : 999;
-          const numB = matchB ? parseInt(matchB[1]) : 999;
+          const weightA = getWeight(a);
+          const weightB = getWeight(b);
 
-          if (numA !== numB) return numA - numB;
-          return a.localeCompare(b); // fallback to alphabetical if no number
+          if (weightA !== weightB) return weightA - weightB;
+          return a.localeCompare(b);
         });
 
         units.push({ name: unitName, topics });

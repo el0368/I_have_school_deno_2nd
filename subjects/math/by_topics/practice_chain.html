@@ -373,7 +373,12 @@
         border-radius: 50%;
         margin: 2px;
         cursor: pointer;
-        transition: box-shadow 0.12s, opacity 0.2s, width 0.2s, height 0.2s, background 0.2s;
+        transition:
+          box-shadow 0.12s,
+          opacity 0.2s,
+          width 0.2s,
+          height 0.2s,
+          background 0.2s;
         position: relative;
         flex-shrink: 0;
         background: transparent;
@@ -384,7 +389,11 @@
 
       /* Progress states */
       .dot.progress-half {
-        background: linear-gradient(90deg, var(--dot-color) 50%, transparent 50%);
+        background: linear-gradient(
+          90deg,
+          var(--dot-color) 50%,
+          transparent 50%
+        );
       }
 
       .dot.progress-full {
@@ -730,17 +739,35 @@
       <span class="subtitle" id="subtitle">Loading...</span>
       <div id="search-wrap">
         <span id="search-icon">&#128269;</span>
-        <input type="text" id="search" placeholder="Search practices..." autocomplete="off" />
+        <input
+          type="text"
+          id="search"
+          placeholder="Search practices..."
+          autocomplete="off"
+        />
       </div>
       <div class="header-controls">
-        <button class="hdr-btn" id="prev-btn" title="Previous practice" disabled>&#9664;</button>
-        <button class="hdr-btn" id="next-btn" title="Next practice" disabled>&#9654;</button>
+        <button
+          class="hdr-btn"
+          id="prev-btn"
+          title="Previous practice"
+          disabled
+        >
+          &#9664;
+        </button>
+        <button class="hdr-btn" id="next-btn" title="Next practice" disabled>
+          &#9654;
+        </button>
         <div class="hdr-sep"></div>
-        <button class="hdr-btn" id="zoom-out" title="Smaller dots">&minus;</button>
+        <button class="hdr-btn" id="zoom-out" title="Smaller dots">
+          &minus;
+        </button>
         <span class="hdr-label" id="zoom-level">100%</span>
         <button class="hdr-btn" id="zoom-in" title="Bigger dots">+</button>
         <div class="hdr-sep"></div>
-        <button class="hdr-btn" id="theme-toggle" title="Toggle light/dark">&#9788;</button>
+        <button class="hdr-btn" id="theme-toggle" title="Toggle light/dark">
+          &#9788;
+        </button>
       </div>
     </div>
 
@@ -756,7 +783,8 @@
           <div id="empty-state">
             <div class="icon">&#9675;</div>
             <p>
-              Click any <strong>dot</strong> to see its name, prerequisites, and what it unlocks
+              Click any <strong>dot</strong> to see its name, prerequisites, and
+              what it unlocks
             </p>
           </div>
         </div>
@@ -781,7 +809,9 @@
 
         // Progress tracking - load from localStorage
         const STORAGE_KEY = "practice_progress";
-        const progress = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        const progress = JSON.parse(
+          localStorage.getItem(STORAGE_KEY) || "{}",
+        );
 
         function saveProgress() {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
@@ -797,7 +827,11 @@
         function applyDotProgress(id) {
           const el = allDotEls[id];
           if (!el) return;
-          el.classList.remove("progress-half", "progress-full", "progress-fail");
+          el.classList.remove(
+            "progress-half",
+            "progress-full",
+            "progress-fail",
+          );
           const state = progress[id];
           if (state) el.classList.add("progress-" + state);
         }
@@ -806,8 +840,12 @@
         const forward = {};
         const backward = {};
         links.forEach((l) => {
-          const s = typeof l.source === "object" ? l.source.id : l.source;
-          const t = typeof l.target === "object" ? l.target.id : l.target;
+          const s = typeof l.source === "object"
+            ? l.source.id
+            : l.source;
+          const t = typeof l.target === "object"
+            ? l.target.id
+            : l.target;
           if (!forward[s]) forward[s] = [];
           forward[s].push({ id: t, type: l.type });
           if (!backward[t]) backward[t] = [];
@@ -856,7 +894,11 @@
             groups[n.grade].push(n);
           });
           return Object.keys(groups).map(Number).sort((a, b) => a - b)
-            .map((g) => ({ grade: g, label: groups[g][0].gradeLabel, nodes: groups[g] }));
+            .map((g) => ({
+              grade: g,
+              label: groups[g][0].gradeLabel,
+              nodes: groups[g],
+            }));
         }
 
         /* ── Build DOM ────────────────────────────── */
@@ -870,7 +912,10 @@
 
           const tierHdr = document.createElement("div");
           tierHdr.className = "tier-header";
-          const tierCount = sortedTopics.reduce((sum, t) => sum + topicNodes[t].length, 0);
+          const tierCount = sortedTopics.reduce(
+            (sum, t) => sum + topicNodes[t].length,
+            0,
+          );
           tierHdr.innerHTML = `
       <div class="tier-dot" style="border:1.5px solid ${
             tierColors[tier]
@@ -899,7 +944,9 @@
             const label = document.createElement("div");
             label.className = "topic-label";
             label.innerHTML = `
-        <span class="topic-num">${String(topicNum).padStart(2, "0")}.</span>
+        <span class="topic-num">${
+              String(topicNum).padStart(2, "0")
+            }.</span>
         <span class="topic-name">${info.name}</span>
         <span class="topic-count">${topicNodes[topicNum].length}</span>
       `;
@@ -925,8 +972,14 @@
                 const state = progress[n.id];
                 if (state) dot.classList.add("progress-" + state);
 
-                dot.addEventListener("mouseenter", (e) => showTooltip(e, n));
-                dot.addEventListener("mousemove", (e) => moveTooltip(e));
+                dot.addEventListener(
+                  "mouseenter",
+                  (e) => showTooltip(e, n),
+                );
+                dot.addEventListener(
+                  "mousemove",
+                  (e) => moveTooltip(e),
+                );
                 dot.addEventListener("mouseleave", hideTooltip);
                 dot.addEventListener("click", (e) => {
                   e.stopPropagation();
@@ -959,7 +1012,8 @@
           `${nodes.length.toLocaleString()} exercises \u00B7 ${
             Object.keys(topicInfo).length
           } topics`;
-        document.getElementById("vis-count").textContent = nodes.length.toLocaleString();
+        document.getElementById("vis-count").textContent = nodes.length
+          .toLocaleString();
 
         /* ── Tooltip ──────────────────────────────── */
         const tooltip = document.getElementById("tooltip");
@@ -976,7 +1030,8 @@
           tooltip.innerHTML = `
       <div class="tt-name">${n.name}${
             statusText
-              ? '<span style="margin-left:6px;font-size:10px;opacity:0.7">' + statusText +
+              ? '<span style="margin-left:6px;font-size:10px;opacity:0.7">' +
+                statusText +
                 "</span>"
               : ""
           }</div>
@@ -1065,10 +1120,18 @@
           document.querySelectorAll(".topic-row").forEach((r) =>
             r.classList.remove("active-topic")
           );
-          const row = document.querySelector(`.topic-row[data-topic="${n.topic}"]`);
+          const row = document.querySelector(
+            `.topic-row[data-topic="${n.topic}"]`,
+          );
           if (row) row.classList.add("active-topic");
 
-          updateDetailPanel(n, directPrereqs, directUnlocks, prereqSet, unlockSet);
+          updateDetailPanel(
+            n,
+            directPrereqs,
+            directUnlocks,
+            prereqSet,
+            unlockSet,
+          );
           updateNavButtons();
 
           const dotEl = allDotEls[n.id];
@@ -1102,7 +1165,13 @@
         }
 
         /* ── Detail Panel ─────────────────────────── */
-        function updateDetailPanel(n, prereqIds, unlockIds, allPrereqs, allUnlocks) {
+        function updateDetailPanel(
+          n,
+          prereqIds,
+          unlockIds,
+          allPrereqs,
+          allUnlocks,
+        ) {
           document.getElementById("detail-title").textContent = n.name;
           document.getElementById("detail-meta").innerHTML = `
       <div>${n.gradeLabel}${n.unit ? " &middot; " + n.unit : ""}</div>
@@ -1120,17 +1189,20 @@
           startSec.className = "detail-section";
           startSec.innerHTML =
             `<button class="start-practice-btn">&#9654; Start Practice</button>`;
-          startSec.querySelector("button").addEventListener("click", () => {
-            // Mark as half-filled (in progress) automatically
-            setProgress(n.id, "half");
-            // Search Khan Academy for this practice
-            const q = encodeURIComponent(n.name + " Khan Academy");
-            window.open(
-              "https://www.khanacademy.org/search?referer=%2F&page_search_query=" +
-                encodeURIComponent(n.name),
-              "_blank",
-            );
-          });
+          startSec.querySelector("button").addEventListener(
+            "click",
+            () => {
+              // Mark as half-filled (in progress) automatically
+              setProgress(n.id, "half");
+              // Search Khan Academy for this practice
+              const q = encodeURIComponent(n.name + " Khan Academy");
+              window.open(
+                "https://www.khanacademy.org/search?referer=%2F&page_search_query=" +
+                  encodeURIComponent(n.name),
+                "_blank",
+              );
+            },
+          );
           body.appendChild(startSec);
 
           // Auto-progress: Mark complete / fail buttons
@@ -1162,7 +1234,13 @@
             btn.addEventListener("click", () => {
               setProgress(n.id, btn.dataset.result);
               // Re-render panel to update button highlights
-              updateDetailPanel(n, prereqIds, unlockIds, allPrereqs, allUnlocks);
+              updateDetailPanel(
+                n,
+                prereqIds,
+                unlockIds,
+                allPrereqs,
+                allUnlocks,
+              );
             });
           });
           body.appendChild(resultSec);
@@ -1184,7 +1262,10 @@
             <span class="dep-name">${pn.name}</span>
             <span class="dep-context">${pn.gradeLabel}</span>
           `;
-                item.addEventListener("click", () => selectPractice(pn));
+                item.addEventListener(
+                  "click",
+                  () => selectPractice(pn),
+                );
                 sec.appendChild(item);
               });
             body.appendChild(sec);
@@ -1207,7 +1288,10 @@
             <span class="dep-name">${un.name}</span>
             <span class="dep-context">${un.gradeLabel}</span>
           `;
-                item.addEventListener("click", () => selectPractice(un));
+                item.addEventListener(
+                  "click",
+                  () => selectPractice(un),
+                );
                 sec.appendChild(item);
               });
             body.appendChild(sec);
@@ -1245,7 +1329,8 @@
         }
 
         function resetDetailPanel() {
-          document.getElementById("detail-title").textContent = "Practice Details";
+          document.getElementById("detail-title").textContent =
+            "Practice Details";
           document.getElementById("detail-meta").innerHTML = "";
           document.getElementById("detail-body").innerHTML = `
       <div id="empty-state">
@@ -1273,7 +1358,8 @@
               el.classList.remove("search-match", "search-miss")
             );
             statusEl.textContent = "";
-            document.getElementById("vis-count").textContent = nodes.length
+            document.getElementById("vis-count").textContent = nodes
+              .length
               .toLocaleString();
             return;
           }
@@ -1291,10 +1377,16 @@
           });
 
           statusEl.textContent = `${matchCount} matches`;
-          document.getElementById("vis-count").textContent = matchCount.toLocaleString();
+          document.getElementById("vis-count").textContent = matchCount
+            .toLocaleString();
 
           const first = document.querySelector(".dot.search-match");
-          if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+          if (first) {
+            first.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }
         }
 
         searchInput.addEventListener("keydown", (e) => {
@@ -1333,7 +1425,10 @@
 
         function updateZoom() {
           const newSize = Math.round(baseSize * (currentZoom / 100));
-          document.documentElement.style.setProperty("--dot-size", newSize + "px");
+          document.documentElement.style.setProperty(
+            "--dot-size",
+            newSize + "px",
+          );
           zoomLabel.textContent = currentZoom + "%";
         }
 
@@ -1381,21 +1476,30 @@
         nextBtn.addEventListener("click", () => {
           if (!selectedId) return;
           const idx = navOrder.findIndex((n) => n.id === selectedId);
-          if (idx < navOrder.length - 1) selectPractice(navOrder[idx + 1]);
+          if (idx < navOrder.length - 1) {
+            selectPractice(navOrder[idx + 1]);
+          }
         });
 
         /* ── Theme Toggle ─────────────────────────── */
         const themeToggle = document.getElementById("theme-toggle");
-        const savedTheme = localStorage.getItem("practice_theme") || "dark";
+        const savedTheme = localStorage.getItem("practice_theme") ||
+          "dark";
         document.documentElement.setAttribute("data-theme", savedTheme);
-        themeToggle.innerHTML = savedTheme === "dark" ? "&#9788;" : "&#9790;";
+        themeToggle.innerHTML = savedTheme === "dark"
+          ? "&#9788;"
+          : "&#9790;";
 
         themeToggle.addEventListener("click", () => {
-          const current = document.documentElement.getAttribute("data-theme");
+          const current = document.documentElement.getAttribute(
+            "data-theme",
+          );
           const next = current === "dark" ? "light" : "dark";
           document.documentElement.setAttribute("data-theme", next);
           localStorage.setItem("practice_theme", next);
-          themeToggle.innerHTML = next === "dark" ? "&#9788;" : "&#9790;";
+          themeToggle.innerHTML = next === "dark"
+            ? "&#9788;"
+            : "&#9790;";
         });
       })();
     </script>

@@ -189,7 +189,8 @@
     <div id="legend">
       <h3>Level</h3>
       <div class="legend-item">
-        <div class="legend-dot" style="background: #4ade80"></div> Foundation (K–3)
+        <div class="legend-dot" style="background: #4ade80"></div> Foundation
+        (K–3)
       </div>
       <div class="legend-item">
         <div class="legend-dot" style="background: #38bdf8"></div> Core (3–6)
@@ -198,7 +199,8 @@
         <div class="legend-dot" style="background: #a78bfa"></div> Bridge (5–8)
       </div>
       <div class="legend-item">
-        <div class="legend-dot" style="background: #f97316"></div> Advanced (8–College)
+        <div class="legend-dot" style="background: #f97316"></div> Advanced
+        (8–College)
       </div>
       <div class="legend-item">
         <div class="legend-dot" style="background: #f43f5e"></div> Capstone
@@ -465,7 +467,10 @@
       // ══════════════════════════════════════════════════════════════════
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const svg = d3.select("#graph").attr("width", width).attr("height", height);
+      const svg = d3.select("#graph").attr("width", width).attr(
+        "height",
+        height,
+      );
       const tooltip = d3.select("#tooltip");
 
       // Zoom container
@@ -491,7 +496,10 @@
       // Glow filter
       const defs = svg.select("defs");
       const filter = defs.append("filter").attr("id", "glow");
-      filter.append("feGaussianBlur").attr("stdDeviation", "3").attr("result", "blur");
+      filter.append("feGaussianBlur").attr("stdDeviation", "3").attr(
+        "result",
+        "blur",
+      );
       const merge = filter.append("feMerge");
       merge.append("feMergeNode").attr("in", "blur");
       merge.append("feMergeNode").attr("in", "SourceGraphic");
@@ -570,8 +578,12 @@
         // Highlight connected
         const connectedIds = new Set([d.id]);
         links.forEach((l) => {
-          const s = typeof l.source === "object" ? l.source.id : l.source;
-          const t = typeof l.target === "object" ? l.target.id : l.target;
+          const s = typeof l.source === "object"
+            ? l.source.id
+            : l.source;
+          const t = typeof l.target === "object"
+            ? l.target.id
+            : l.target;
           if (s === d.id) connectedIds.add(t);
           if (t === d.id) connectedIds.add(s);
         });
@@ -581,19 +593,31 @@
 
         linkSel.transition().duration(150)
           .attr("stroke", (l) => {
-            const s = typeof l.source === "object" ? l.source.id : l.source;
-            const t = typeof l.target === "object" ? l.target.id : l.target;
+            const s = typeof l.source === "object"
+              ? l.source.id
+              : l.source;
+            const t = typeof l.target === "object"
+              ? l.target.id
+              : l.target;
             if (s === d.id || t === d.id) return d.color;
             return "#2a2e44";
           })
           .attr("stroke-width", (l) => {
-            const s = typeof l.source === "object" ? l.source.id : l.source;
-            const t = typeof l.target === "object" ? l.target.id : l.target;
+            const s = typeof l.source === "object"
+              ? l.source.id
+              : l.source;
+            const t = typeof l.target === "object"
+              ? l.target.id
+              : l.target;
             return (s === d.id || t === d.id) ? 2.8 : 1.2;
           })
           .attr("opacity", (l) => {
-            const s = typeof l.source === "object" ? l.source.id : l.source;
-            const t = typeof l.target === "object" ? l.target.id : l.target;
+            const s = typeof l.source === "object"
+              ? l.source.id
+              : l.source;
+            const t = typeof l.target === "object"
+              ? l.target.id
+              : l.target;
             return (s === d.id || t === d.id) ? 1 : 0.1;
           });
 
@@ -601,13 +625,21 @@
         const prereqs = [];
         const unlocks = [];
         links.forEach((l) => {
-          const s = typeof l.source === "object" ? l.source.id : l.source;
-          const t = typeof l.target === "object" ? l.target.id : l.target;
+          const s = typeof l.source === "object"
+            ? l.source.id
+            : l.source;
+          const t = typeof l.target === "object"
+            ? l.target.id
+            : l.target;
           if (t === d.id) {
-            prereqs.push(nodes.find((n) => n.id === s).label.replace(/\n/g, " "));
+            prereqs.push(
+              nodes.find((n) => n.id === s).label.replace(/\n/g, " "),
+            );
           }
           if (s === d.id) {
-            unlocks.push(nodes.find((n) => n.id === t).label.replace(/\n/g, " "));
+            unlocks.push(
+              nodes.find((n) => n.id === t).label.replace(/\n/g, " "),
+            );
           }
         });
 
@@ -639,8 +671,12 @@
           let x = event.clientX + pad;
           let y = event.clientY + pad;
           const rect = tooltip.node().getBoundingClientRect();
-          if (x + rect.width > window.innerWidth) x = event.clientX - rect.width - pad;
-          if (y + rect.height > window.innerHeight) y = event.clientY - rect.height - pad;
+          if (x + rect.width > window.innerWidth) {
+            x = event.clientX - rect.width - pad;
+          }
+          if (y + rect.height > window.innerHeight) {
+            y = event.clientY - rect.height - pad;
+          }
           tooltip.style("left", x + "px").style("top", y + "px");
         })
         .on("mouseleave", () => {
@@ -661,7 +697,12 @@
       let physicsOn = true;
 
       const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id((d) => d.id).distance(120).strength(0.4))
+        .force(
+          "link",
+          d3.forceLink(links).id((d) => d.id).distance(120).strength(
+            0.4,
+          ),
+        )
         .force("charge", d3.forceManyBody().strength(-500))
         .force("centerX", d3.forceX(width / 2).strength(0.06))
         .force("tierY", d3.forceY((d) => tierY[d.tier]).strength(0.35))
@@ -708,7 +749,10 @@
       // ══════════════════════════════════════════════════════════════════
       function resetZoom() {
         svg.transition().duration(600)
-          .call(zoomBehavior.transform, d3.zoomIdentity.translate(0, 0).scale(1));
+          .call(
+            zoomBehavior.transform,
+            d3.zoomIdentity.translate(0, 0).scale(1),
+          );
       }
 
       function togglePhysics() {
