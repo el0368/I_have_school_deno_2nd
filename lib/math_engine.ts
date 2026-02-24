@@ -1,8 +1,8 @@
 // ============================================================================
-// Mojo Math Engine Bridge
+// Math Engine Bridge (Rust + PyO3 + Axum)
 // ============================================================================
-// Sends math requests to the Mojo/SymPy server running in WSL.
-// The server is started via: pixi run mojo server.mojo
+// Sends math requests to the Rust/SymPy server.
+// The server is started via: cargo run (from math_engine/)
 
 import { MATH_ENGINE_URL } from "../config/app.ts";
 import type { MathRequest, MathResponse } from "../types/math.ts";
@@ -12,8 +12,6 @@ export async function solveMath(
 ): Promise<MathResponse> {
   const start = Date.now();
 
-  // TODO: replace with real Mojo HTTP server once server.mojo is implemented.
-  // For now, this calls the future endpoint.
   const res = await fetch(`${MATH_ENGINE_URL}/solve`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

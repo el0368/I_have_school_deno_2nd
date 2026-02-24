@@ -9,5 +9,6 @@ export const APP_VERSION = "0.1.0";
 export const SESSION_COOKIE = "sa_session";
 export const SESSION_DURATION_DAYS = 30;
 
+// Rust math engine (Axum + PyO3). Started via: cargo run (from math_engine/)
 export const MATH_ENGINE_URL = Deno.env.get("MATH_ENGINE_URL") ??
   "http://localhost:8080";

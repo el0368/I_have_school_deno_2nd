@@ -1,5 +1,5 @@
 // ============================================================================
-// Math Engine Types (Client <-> Mojo Server)
+// Math Engine Types (Deno <-> Rust/Axum Server)
 // ============================================================================
 
 export type MathOperation =

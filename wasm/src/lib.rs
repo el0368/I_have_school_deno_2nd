@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-// WASM utilities — math computation is handled server-side by Mojo + SymPy.
+// WASM utilities — math computation is handled server-side by Rust + PyO3 + SymPy.
 // This module is reserved for future browser-side utilities
 // (e.g. Typst rendering, graph helpers, offline tools).
 

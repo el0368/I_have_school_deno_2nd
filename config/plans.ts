@@ -33,7 +33,7 @@ export const PLANS: Record<string, Plan> = {
     features: [
       "Everything in Pro",
       "University & PhD level content",
-      "Full Mojo/SymPy CAS access",
+      "Full CAS access (SymPy via Rust engine)",
       "Symbolic integration, ODEs, Linear Algebra",
       "Priority support",
     ],

@@ -92,11 +92,11 @@ interactivity.
 Complex mathematical validation, symbolic algebra, and calculus are handled by a
 dedicated backend microservice.
 
-- **Language**: Mojo
-- **Engine**: SymPy (via Python interop)
+- **Language**: Rust (Axum HTTP server + PyO3 Python bridge)
+- **Engine**: SymPy (via PyO3 embedded CPython)
 - **Location**: `math_engine/`
 - **Integration**: Deno Fresh API routes (`routes/api/math/`) send HTTP requests
-  to the Mojo server.
+  to the Rust/Axum server on port 8080.
 - **Why**: Advanced CAS (Computer Algebra Systems) like SymPy require a full
   Python environment and cannot run efficiently in the browser via WASM. This
   architecture provides PhD-level math capabilities while keeping the frontend

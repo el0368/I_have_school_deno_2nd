@@ -1,0 +1,22 @@
+[package]
+name = "math_engine"
+version = "0.1.0"
+edition = "2021"
+description = "CAS math engine using SymPy via PyO3, served by Axum"
+
+[dependencies]
+# HTTP server
+axum = "0.8"
+tokio = { version = "1", features = ["full"] }
+tower-http = { version = "0.6", features = ["cors", "timeout"] }
+
+# Python bridge (SymPy)
+pyo3 = { version = "0.23", features = ["auto-initialize"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = "0.3"

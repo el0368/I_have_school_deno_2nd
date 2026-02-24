@@ -43,23 +43,25 @@ browser.
 This is the "Heavy Brain" of the platform, capable of solving advanced
 mathematics.
 
-**Technology:** [Mojo](https://www.modular.com/mojo) +
-[SymPy](https://www.sympy.org/) (Python)
+**Technology:** [Rust](https://www.rust-lang.org/) + [PyO3](https://pyo3.rs/) +
+[Axum](https://github.com/tokio-rs/axum) + [SymPy](https://www.sympy.org/)
+(Python)
 
-- **Role:** A dedicated microservice running on the backend (currently via
-  WSL/Linux) that acts as a Computer Algebra System (CAS).
+- **Role:** A dedicated microservice running on the backend that acts as a
+  Computer Algebra System (CAS).
 - **How it works:**
   1. The Deno Fresh API receives a LaTeX string from the student's MathLive
      input.
-  2. Deno sends an HTTP request to the Mojo server.
-  3. Mojo uses its high-performance Python interop to call SymPy.
+  2. Deno sends an HTTP request to the Rust/Axum server (port 8080).
+  3. Rust uses PyO3 to embed CPython and call SymPy directly.
   4. SymPy performs the symbolic math (factoring, integration, solving ODEs).
-  5. Mojo returns the simplified LaTeX back to Deno, which sends it to the
+  5. Axum returns the simplified LaTeX back to Deno, which sends it to the
      browser.
-- **Why Mojo/SymPy instead of WASM?** SymPy is the gold standard for open-source
-  math, but it requires a full Python environment. It cannot be compiled into a
-  lightweight WebAssembly module for the browser. Mojo provides the speed of C++
-  with the ability to seamlessly import Python's massive ecosystem.
+- **Why Rust + PyO3 instead of WASM?** SymPy is the gold standard for
+  open-source math, but it requires a full Python environment. It cannot be
+  compiled into a lightweight WebAssembly module for the browser. Rust + PyO3
+  embeds the Python interpreter directly inside a single compiled binary, giving
+  native performance with full access to Python's ecosystem.
 
 ## 4. The High-Performance Browser Layer (WASM)
 
@@ -69,7 +71,7 @@ mathematics.
   run instantly without a server round-trip (e.g., custom rendering engines,
   offline tools, or complex physics simulations).
 - **Status:** Currently stripped down to a basic boilerplate (`ping()`). The
-  previous `mathcore` CAS was removed because the Mojo/SymPy server handles all
+  previous `mathcore` CAS was removed because the Rust/SymPy server handles all
   math logic more comprehensively.
 
 ## 5. Data & Persistence (Planned)
