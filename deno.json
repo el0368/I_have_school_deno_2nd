@@ -9,7 +9,9 @@
     "precommit": "deno fmt && deno lint",
     "test": "deno test -A --unstable-kv tests/",
     "seed": "deno run -A --unstable-kv scripts/seed_db.ts",
-    "wasm": "bash scripts/build_wasm.sh"
+    "wasm": "bash scripts/build_wasm.sh",
+    "math": "cd math_engine && cargo run --release",
+    "math:dev": "cd math_engine && cargo run"
   },
   "lint": {
     "rules": {
