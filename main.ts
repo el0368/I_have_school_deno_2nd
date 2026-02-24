@@ -4,10 +4,30 @@ import { type State } from "./utils.ts";
 import mdxRoutes from "./mdx-routes.ts";
 import { CurriculumLayout } from "./components/CurriculumLayout.tsx";
 import { log } from "./lib/logger.ts";
+import { loadEnv } from "./config/env.ts";
+
+// Validate all required environment variables at startup.
+// This will throw immediately if SESSION_SECRET (or other required vars) is missing.
+loadEnv();
 
 export const app = new App<State>();
 
 app.use(staticFiles());
+
+// Security middleware — CORS + basic headers
+app.use(async (ctx) => {
+  const res = await ctx.next();
+  res.headers.set("X-Content-Type-Options", "nosniff");
+  res.headers.set("X-Frame-Options", "DENY");
+  res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  // Only allow API calls from our own origin in production
+  const origin = ctx.req.headers.get("origin") ?? "";
+  const allowed = Deno.env.get("APP_URL") ?? "http://localhost:5173";
+  if (origin === allowed || origin === "") {
+    res.headers.set("Access-Control-Allow-Origin", origin || "*");
+  }
+  return res;
+});
 
 // Request logger
 app.use(async (ctx) => {
@@ -62,29 +82,23 @@ app.get("*", async (ctx) => {
       return ctx.next();
     }
 
-    // Define the KaTeX stylesheet to ensure math formulas render correctly
-    const KaTeXStyle = () =>
-      h("link", {
-        rel: "stylesheet",
-        href: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css",
-        crossorigin: "anonymous",
-      });
-
     /**
      * 2. LAYOUT FLEXIBILITY
      * We render the MDX content directly.
      * If the path starts with /learn/, we wrap it in our CurriculumLayout side-bar.
+     * Math is rendered by MathJax (rehype-mathjax, server-side) and MathLive (islands).
+     * No CDN dependencies needed here.
      */
     if (path.startsWith("/learn/")) {
       return ctx.render(
         h(CurriculumLayout, {
           path,
-          children: h("div", null, h(KaTeXStyle, null), h(MDXContent, null)),
+          children: h(MDXContent, null),
         }),
       );
     }
 
-    return ctx.render(h("div", null, h(KaTeXStyle, null), h(MDXContent, null)));
+    return ctx.render(h(MDXContent, null));
   } catch (e) {
     /**
      * 3. FATAL ERROR REPORTING
