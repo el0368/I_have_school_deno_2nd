@@ -1,0 +1,14 @@
+[workspace]
+channels = ["conda-forge", "https://conda.modular.com/max"]
+name = "math_engine"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+test = "mojo test_sympy.mojo"
+server = "mojo server.mojo"
+
+[dependencies]
+mojo = ">=25.5.0,<26"
+python = ">=3.13,<3.15"
+sympy = ">=1.14.0,<2"

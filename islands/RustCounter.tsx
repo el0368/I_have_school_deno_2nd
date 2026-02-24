@@ -1,24 +1,28 @@
 import { useEffect, useState } from "preact/hooks";
-// 1. Import the "init" and your Rust function from the pkg folder
-import init, { add_in_rust } from "../wasm/pkg/wasm.js";
 
 export default function RustCounter() {
+  // deno-lint-ignore no-explicit-any
+  const [wasmMod, setWasmMod] = useState<any>(null);
   const [result, setResult] = useState<number | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // 2. Initialize the WASM module when the component first loads
-    // We use .then() to ensure it finishes before we set isLoaded to true
-    init().then(() => {
-      console.log("Rust WASM Loaded!");
-      setIsLoaded(true);
-    });
+    (async () => {
+      try {
+        const mod = await import("../wasm/pkg/wasm.js");
+        await mod.default();
+        setWasmMod(mod);
+        console.log("Rust WASM Loaded!");
+        setIsLoaded(true);
+      } catch (e) {
+        console.error("Failed to load Rust WASM:", e);
+      }
+    })();
   }, []);
 
   const handleCalc = () => {
-    if (isLoaded) {
-      // 3. Call your Rust function just like a normal JavaScript function!
-      const val = add_in_rust(10, 20);
+    if (isLoaded && wasmMod) {
+      const val = wasmMod.add_in_rust(10, 20);
       setResult(val);
     }
   };
@@ -46,7 +50,7 @@ export default function RustCounter() {
             {result !== null && (
               <div class="p-2 bg-white border border-orange-200 rounded text-center">
                 <span class="text-gray-500">Result:</span>
-                <span class="text-2xl font-black text-orange-600 underline Decoration-double">
+                <span class="text-2xl font-black text-orange-600">
                   {result}
                 </span>
               </div>
