@@ -87,17 +87,34 @@ interactivity.
 
 ---
 
-## 5. Rust WASM Engine
+## 5. The Math Engine (Server-Side CAS)
 
-Complex mathematical validation and scoring logic lives in `wasm/src/lib.rs` and
-is compiled with `wasm-pack`.
+Complex mathematical validation, symbolic algebra, and calculus are handled by a
+dedicated backend microservice.
+
+- **Language**: Mojo
+- **Engine**: SymPy (via Python interop)
+- **Location**: `math_engine/`
+- **Integration**: Deno Fresh API routes (`routes/api/math/`) send HTTP requests
+  to the Mojo server.
+- **Why**: Advanced CAS (Computer Algebra Systems) like SymPy require a full
+  Python environment and cannot run efficiently in the browser via WASM. This
+  architecture provides PhD-level math capabilities while keeping the frontend
+  lightweight.
+
+---
+
+## 6. Rust WASM Engine (Client-Side Utilities)
+
+Lightweight, instant client-side utilities are written in Rust and compiled to
+WebAssembly.
 
 - **Source**: `wasm/src/lib.rs`
-- **Output**: `wasm/pkg/` (auto-generated, not committed)
-- **Integration**: Imported by Preact Islands via
-  `import init from "../../wasm/pkg/wasm.js"`.
+- **Output**: `static/wasm_bg.wasm`
+- **Integration**: Imported by Preact Islands.
 - **Rule**: WASM must only be called from `islands/`, never in server-side
-  routes.
+  routes. Currently reserved for future high-performance browser tasks (e.g.,
+  custom rendering or offline tools).
 
 ---
 
