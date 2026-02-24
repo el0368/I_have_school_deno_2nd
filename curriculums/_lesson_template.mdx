@@ -1,0 +1,124 @@
+{/*
+  ═══════════════════════════════════════════════════════════════════════
+  LESSON TEMPLATE — Copy this file when creating a new lesson.
+  ═══════════════════════════════════════════════════════════════════════
+
+  HOW TO USE:
+  1. Copy this file into the correct unit folder:
+     curriculums/math/grade_X/unit_Y_name/Z_lesson_name.mdx
+
+  2. The filename becomes the URL path:
+     File:  curriculums/math/grade_1/unit_1_place_value/1_numbers_from_1_to_9.mdx
+     URL:   /learn/math/grade_1/unit_1_place_value/1_numbers_from_1_to_9
+
+  3. Replace all placeholder content below.
+
+  4. To embed an interactive exercise, import MathInput:
+     import MathInput from "@/islands/MathInput.tsx";
+
+  NAMING CONVENTION:
+    - introduction.mdx        → Unit intro (always first)
+    - 1_topic_name.mdx         → Numbered lessons (sorted ascending)
+    - 2_topic_name.mdx
+    - quiz_unit_name.mdx       → End-of-unit quiz (always last)
+    - unit_test_unit_name.mdx  → End-of-unit test (after quiz)
+  ═══════════════════════════════════════════════════════════════════════
+*/}
+
+import MathInput from "@/islands/MathInput.tsx";
+
+# Topic N: Lesson Title
+
+> **Learning Goal:** Describe what the student will be able to do after this lesson.
+> By the end of this topic you will be able to:
+> - Skill 1
+> - Skill 2
+> - Skill 3
+
+---
+
+## 📚 Vocabulary
+
+| Word | Meaning | Quick Example |
+|---|---|---|
+| **Term** | Definition | Example |
+
+---
+
+## 🔢 Section 1: Concept Introduction
+
+Explain the concept here. Use LaTeX for any math notation:
+
+- Inline math: $2 + 3 = 5$
+- Block math:
+
+$$
+a^2 + b^2 = c^2
+$$
+
+---
+
+## 🧠 Section 2: Worked Examples
+
+### Example 1
+
+**Problem:** State the problem clearly.
+
+**Solution:**
+
+$$
+\text{Step 1: ...}
+$$
+$$
+\text{Step 2: ...}
+$$
+$$
+\text{Answer: ...}
+$$
+
+### Example 2
+
+**Problem:** Another worked example.
+
+**Solution:**
+
+Show step-by-step work here.
+
+---
+
+## ✏️ Section 3: Practice (Try It Yourself!)
+
+Answer these questions by typing your answer in the math box.
+
+**Question 1:** What is $2 + 3$?
+
+<MathInput
+  question="What is 2 + 3?"
+  correctAnswer="5"
+/>
+
+**Question 2:** Simplify $\frac{4}{8}$
+
+<MathInput
+  question="Simplify this fraction."
+  correctAnswer="\frac{1}{2}"
+/>
+
+---
+
+## 🎯 Section 4: Challenge Problems
+
+These are optional problems for students who want more practice.
+
+1. Problem statement here
+2. Problem statement here
+
+---
+
+## 📝 Summary
+
+- **Key takeaway 1**: ...
+- **Key takeaway 2**: ...
+- **Key takeaway 3**: ...
+
+> 💡 **Remember:** One memorable rule or tip from this lesson.

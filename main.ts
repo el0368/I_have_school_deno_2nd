@@ -90,9 +90,29 @@ app.get("*", async (ctx) => {
      * No CDN dependencies needed here.
      */
     if (path.startsWith("/learn/")) {
+      // ─── Prev / Next lesson computation ─────────────────────────────
+      // Collect all /learn/ paths that share the same parent folder,
+      // sort them, and find the neighbors of the current path.
+      const parentDir = path.substring(0, path.lastIndexOf("/"));
+      const siblings = Object.keys(mdxRoutes)
+        .filter((p) => {
+          if (!p.startsWith("/learn/")) return false;
+          const pParent = p.substring(0, p.lastIndexOf("/"));
+          return pParent === parentDir;
+        })
+        .sort();
+
+      const idx = siblings.indexOf(path);
+      const prevLesson = idx > 0 ? siblings[idx - 1] : undefined;
+      const nextLesson = idx < siblings.length - 1
+        ? siblings[idx + 1]
+        : undefined;
+
       return ctx.render(
         h(CurriculumLayout, {
           path,
+          prevLesson,
+          nextLesson,
           children: h(MDXContent, null),
         }),
       );

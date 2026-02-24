@@ -9,7 +9,8 @@ export type MathOperation =
   | "solve"
   | "differentiate"
   | "integrate"
-  | "latex";
+  | "latex"
+  | "check";
 
 export interface MathRequest {
   expression: string;
@@ -20,6 +21,29 @@ export interface MathRequest {
 export interface MathResponse {
   result: string; // LaTeX string
   operation: MathOperation;
+  durationMs: number;
+  error?: string;
+}
+
+// ─── Answer Checking ──────────────────────────────────────────────────────────
+
+/** Sent from MathInput island → /api/math/check */
+export interface CheckRequest {
+  /** The student's LaTeX answer */
+  studentAnswer: string;
+  /** The correct LaTeX answer (embedded in the MDX as a prop) */
+  correctAnswer: string;
+  /** Optional: the operation to use for normalization (default: "simplify") */
+  operation?: MathOperation;
+}
+
+/** Returned from /api/math/check → MathInput island */
+export interface CheckResponse {
+  correct: boolean;
+  /** Normalized form of the student's answer (for debugging / "show steps") */
+  normalizedStudent: string;
+  /** Normalized form of the correct answer */
+  normalizedCorrect: string;
   durationMs: number;
   error?: string;
 }

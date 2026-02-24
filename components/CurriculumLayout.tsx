@@ -4,9 +4,15 @@ import MarkCompleteButton from "../islands/MarkCompleteButton.tsx";
 interface Props {
   children: ComponentChildren;
   path: string;
+  /** URL of the previous lesson (set by the MDX router in main.ts) */
+  prevLesson?: string;
+  /** URL of the next lesson (set by the MDX router in main.ts) */
+  nextLesson?: string;
 }
 
-export function CurriculumLayout({ children, path }: Props) {
+export function CurriculumLayout(
+  { children, path, prevLesson, nextLesson }: Props,
+) {
   const parts = path.split("/");
   const filename = parts[parts.length - 1];
   const title = filename
@@ -18,6 +24,13 @@ export function CurriculumLayout({ children, path }: Props) {
   const breadcrumb = parts.map((p: string) =>
     p.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
   ).filter(Boolean).join(" > ");
+
+  // Derive the grade overview link (e.g. /curriculum/math/grade_1)
+  // Path looks like /learn/math/grade_1/unit_1_place_value/1_numbers
+  const gradeOverviewLink = (() => {
+    const match = path.match(/^\/learn\/math\/(grade_\d+)/);
+    return match ? `/curriculum/math/${match[1]}` : "/curriculum/math";
+  })();
 
   return (
     <>
@@ -40,6 +53,9 @@ export function CurriculumLayout({ children, path }: Props) {
           </div>
 
           <div class="sidebar-footer">
+            <a href={gradeOverviewLink} class="sidebar-link">
+              ← Back to Grade Overview
+            </a>
             <a
               href="/"
               class="sidebar-link"
@@ -58,6 +74,24 @@ export function CurriculumLayout({ children, path }: Props) {
             </article>
 
             <hr class="divider" />
+
+            {/* Prev / Next Navigation */}
+            <nav class="lesson-nav">
+              {prevLesson
+                ? (
+                  <a href={prevLesson} class="lesson-nav-link lesson-nav-prev">
+                    ← Previous Lesson
+                  </a>
+                )
+                : <span />}
+              {nextLesson
+                ? (
+                  <a href={nextLesson} class="lesson-nav-link lesson-nav-next">
+                    Next Lesson →
+                  </a>
+                )
+                : <span />}
+            </nav>
 
             {/* Footer */}
             <div class="card-footer">
