@@ -1,33 +1,23 @@
 import { h } from "preact";
 import { App, staticFiles } from "fresh";
-import { define, type State } from "./utils.ts";
+import { type State } from "./utils.ts";
 import mdxRoutes from "./mdx-routes.ts";
 import { CurriculumLayout } from "./components/CurriculumLayout.tsx";
+import { log } from "./lib/logger.ts";
 
 export const app = new App<State>();
 
 app.use(staticFiles());
 
-// Pass a shared value from a middleware
+// Request logger
 app.use(async (ctx) => {
-  ctx.state.shared = "hello";
-  return await ctx.next();
+  const start = Date.now();
+  const res = await ctx.next();
+  log.debug(`${ctx.req.method} ${new URL(ctx.req.url).pathname}`, {
+    ms: Date.now() - start,
+  });
+  return res;
 });
-
-// this is the same as the /api/:name route defined via a file. feel free to delete this!
-app.get("/api2/:name", (ctx) => {
-  const name = ctx.params.name;
-  return new Response(
-    `Hello, ${name.charAt(0).toUpperCase() + name.slice(1)}!`,
-  );
-});
-
-// this can also be defined via a file. feel free to delete this!
-const exampleLoggerMiddleware = define.middleware((ctx) => {
-  console.log(`${ctx.req.method} ${ctx.req.url}`);
-  return ctx.next();
-});
-app.use(exampleLoggerMiddleware);
 
 // Include file-system based routes here
 app.fsRoutes();
@@ -41,7 +31,7 @@ app.get("*", async (ctx) => {
   const url = new URL(ctx.req.url);
   let path = url.pathname;
 
-  console.log(`[Router Trace] Intercepted path: ${path}`);
+  log.debug(`[MDX Router] ${path}`);
 
   /**
    * 1. URL NORMALIZATION (Trailing Slash Fix)
@@ -60,7 +50,7 @@ app.get("*", async (ctx) => {
   // to show the standard 404 page.
   if (!mdxLoader) return ctx.next();
 
-  console.log(`[MDX Registry] Found loader for: ${path}`);
+  log.debug(`[MDX Registry] Found loader for: ${path}`);
 
   try {
     // Dynamically load the MDX file (Vite handles the translation to JS)
@@ -68,7 +58,7 @@ app.get("*", async (ctx) => {
     const MDXContent = mdxModule.default;
 
     if (!MDXContent) {
-      console.error(`[MDX Error] No default export found for: ${path}`);
+      log.warn(`[MDX] No default export found for: ${path}`);
       return ctx.next();
     }
 
@@ -102,7 +92,7 @@ app.get("*", async (ctx) => {
      * we catch it here and show a 500 Error message.
      * This is much better than a silent 404!
      */
-    console.error(`[MDX Exception] Error loading ${path}:`, e);
+    log.error(`[MDX] Error loading ${path}`, { error: String(e) });
 
     return new Response(
       `500 Internal Server Error\n\nFailed to compile MDX file for path: ${path}\nCheck the terminal for details.`,
