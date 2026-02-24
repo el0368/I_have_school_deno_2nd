@@ -18,7 +18,7 @@ export interface MathRequest {
 }
 
 export interface MathResponse {
-  result: string;      // LaTeX string
+  result: string; // LaTeX string
   operation: MathOperation;
   durationMs: number;
   error?: string;

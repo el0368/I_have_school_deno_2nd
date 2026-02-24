@@ -1,0 +1,19 @@
+#!/bin/sh
+# Pre-commit hook: blocks commit if formatting or linting fails.
+echo "Running pre-commit checks..."
+
+deno fmt --check . 2>&1
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ Formatting check failed. Run: deno fmt"
+  exit 1
+fi
+
+deno lint . 2>&1
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ Lint check failed. Fix the issues above."
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed."

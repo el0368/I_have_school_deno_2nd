@@ -20,7 +20,9 @@ export async function hashPassword(password: string): Promise<string> {
     keyMaterial,
     KEY_LENGTH * 8,
   );
-  const saltHex = [...salt].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const saltHex = [...salt].map((b) => b.toString(16).padStart(2, "0")).join(
+    "",
+  );
   const hashHex = [...new Uint8Array(derived)]
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
