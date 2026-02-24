@@ -5,6 +5,7 @@ import mdxRoutes from "./mdx-routes.ts";
 import { CurriculumLayout } from "./components/CurriculumLayout.tsx";
 import { log } from "./lib/logger.ts";
 import { loadEnv } from "./config/env.ts";
+import { computeLessonNeighbors } from "./utils/lesson_nav.ts";
 
 // Validate all required environment variables at startup.
 // This will throw immediately if SESSION_SECRET (or other required vars) is missing.
@@ -91,22 +92,10 @@ app.get("*", async (ctx) => {
      */
     if (path.startsWith("/learn/")) {
       // ─── Prev / Next lesson computation ─────────────────────────────
-      // Collect all /learn/ paths that share the same parent folder,
-      // sort them, and find the neighbors of the current path.
-      const parentDir = path.substring(0, path.lastIndexOf("/"));
-      const siblings = Object.keys(mdxRoutes)
-        .filter((p) => {
-          if (!p.startsWith("/learn/")) return false;
-          const pParent = p.substring(0, p.lastIndexOf("/"));
-          return pParent === parentDir;
-        })
-        .sort();
-
-      const idx = siblings.indexOf(path);
-      const prevLesson = idx > 0 ? siblings[idx - 1] : undefined;
-      const nextLesson = idx < siblings.length - 1
-        ? siblings[idx + 1]
-        : undefined;
+      const { prevLesson, nextLesson } = computeLessonNeighbors(
+        path,
+        Object.keys(mdxRoutes),
+      );
 
       return ctx.render(
         h(CurriculumLayout, {

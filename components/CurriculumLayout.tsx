@@ -1,5 +1,6 @@
 import { ComponentChildren } from "preact";
 import MarkCompleteButton from "../islands/MarkCompleteButton.tsx";
+import { gradeOverviewLink } from "../utils/lesson_nav.ts";
 
 interface Props {
   children: ComponentChildren;
@@ -26,11 +27,7 @@ export function CurriculumLayout(
   ).filter(Boolean).join(" > ");
 
   // Derive the grade overview link (e.g. /curriculum/math/grade_1)
-  // Path looks like /learn/math/grade_1/unit_1_place_value/1_numbers
-  const gradeOverviewLink = (() => {
-    const match = path.match(/^\/learn\/math\/(grade_\d+)/);
-    return match ? `/curriculum/math/${match[1]}` : "/curriculum/math";
-  })();
+  const overviewLink = gradeOverviewLink(path);
 
   return (
     <>
@@ -53,7 +50,7 @@ export function CurriculumLayout(
           </div>
 
           <div class="sidebar-footer">
-            <a href={gradeOverviewLink} class="sidebar-link">
+            <a href={overviewLink} class="sidebar-link">
               ← Back to Grade Overview
             </a>
             <a
