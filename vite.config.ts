@@ -3,6 +3,8 @@ import { fresh } from "@fresh/plugin-vite";
 import mdx from "@mdx-js/rollup";
 import remarkMath from "remark-math";
 import remarkGfm from "remark-gfm";
+import remarkFrontmatter from "remark-frontmatter";
+import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import rehypeMathjax from "rehype-mathjax";
 import path from "node:path";
 
@@ -10,7 +12,12 @@ export default defineConfig({
   plugins: [
     mdx({
       jsxImportSource: "preact",
-      remarkPlugins: [remarkGfm, remarkMath],
+      remarkPlugins: [
+        remarkGfm,
+        remarkMath,
+        remarkFrontmatter,
+        [remarkMdxFrontmatter, { name: "frontmatter" }],
+      ],
       rehypePlugins: [rehypeMathjax],
     }),
     fresh(),
