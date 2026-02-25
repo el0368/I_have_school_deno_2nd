@@ -1,7 +1,8 @@
 import { ensureDir } from "jsr:@std/fs@1/ensure-dir";
 import { join } from "jsr:@std/path@1";
 
-const BASE = "c:\\GitHub\\I_have_school_deno_2nd\\curriculums\\math\\by_topics";
+const BASE =
+  "c:\\GitHub\\I_have_school_deno_2nd\\curriculums\\en\\math\\by_topics";
 
 interface UnitDef {
   unitFolder: string;

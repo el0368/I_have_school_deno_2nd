@@ -1,7 +1,7 @@
 /**
  * zero_pad_lessons.ts
  *
- * Renames lesson files in curriculums/math/by_topics to use zero-padded
+ * Renames lesson files in curriculums/en/math/by_topics to use zero-padded
  * lesson numbers so alphabetical sort = correct lesson order.
  *
  * Pattern matched:  grade_1_1_title.mdx  →  grade_1_01_title.mdx
@@ -20,7 +20,7 @@ import { walk } from "jsr:@std/fs@1/walk";
 import { dirname, join } from "jsr:@std/path@1";
 
 const DRY_RUN = !Deno.args.includes("--apply");
-const ROOT = "curriculums/math/by_topics";
+const ROOT = "curriculums/en/math/by_topics";
 
 // Matches:  grade_1_1_title.mdx   or   kindergarten_1_title.mdx
 // Group 1: prefix up to and including the grade  (e.g. "grade_1_"  or "kindergarten_")

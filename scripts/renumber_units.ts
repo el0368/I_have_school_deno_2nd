@@ -102,14 +102,14 @@ async function renumberUnits(topicDir: string) {
 
 async function main() {
   const topicsToProcess = [
-    "curriculums/math/by_topics/1_the_core/01_number_sense_and_operations",
-    "curriculums/math/by_topics/1_the_core/02_fractions_and_proportions",
-    "curriculums/math/by_topics/1_the_core/03_patterns_and_rules",
-    "curriculums/math/by_topics/2_space_and_measurement/04_measurement_and_scale",
-    "curriculums/math/by_topics/2_space_and_measurement/05_geometric_reasoning",
-    "curriculums/math/by_topics/3_change_and_relationships/07_variables_and_equations",
-    "curriculums/math/by_topics/4_data_and_uncertainty/10_probability_and_combinatorics",
-    "curriculums/math/by_topics/4_data_and_uncertainty/11_statistics_and_data_science",
+    "curriculums/en/math/by_topics/1_the_core/01_number_sense_and_operations",
+    "curriculums/en/math/by_topics/1_the_core/02_fractions_and_proportions",
+    "curriculums/en/math/by_topics/1_the_core/03_patterns_and_rules",
+    "curriculums/en/math/by_topics/2_space_and_measurement/04_measurement_and_scale",
+    "curriculums/en/math/by_topics/2_space_and_measurement/05_geometric_reasoning",
+    "curriculums/en/math/by_topics/3_change_and_relationships/07_variables_and_equations",
+    "curriculums/en/math/by_topics/4_data_and_uncertainty/10_probability_and_combinatorics",
+    "curriculums/en/math/by_topics/4_data_and_uncertainty/11_statistics_and_data_science",
   ];
 
   for (const topic of topicsToProcess) {

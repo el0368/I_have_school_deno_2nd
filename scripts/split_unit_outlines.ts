@@ -29,7 +29,7 @@ import { walk } from "jsr:@std/fs@1/walk";
 import { dirname, join } from "jsr:@std/path@1";
 
 const DRY_RUN = !Deno.args.includes("--apply");
-const ROOT = "curriculums/math/by_topics";
+const ROOT = "curriculums/en/math/by_topics";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 

@@ -3,7 +3,7 @@ import { Head } from "fresh/runtime";
 
 export default define.page(async function GradeOverview(ctx) {
   const grade = ctx.params.grade; // e.g., "grade_1"
-  const curriculumPath = `curriculums/math/${grade}`;
+  const curriculumPath = `curriculums/en/math/${grade}`;
 
   const units: { name: string; topics: string[] }[] = [];
 

@@ -12,7 +12,7 @@ import { walk } from "jsr:@std/fs@1";
 import { join, relative } from "jsr:@std/path@1";
 
 const DRY = Deno.args.includes("--dry-run");
-const BASE = "curriculums/math/by_topics";
+const BASE = "curriculums/en/math/by_topics";
 
 let renamed = 0;
 let skipped = 0;

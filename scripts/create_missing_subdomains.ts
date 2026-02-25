@@ -15,7 +15,7 @@ import { ensureDir } from "jsr:@std/fs@1";
 import { join } from "jsr:@std/path@1";
 
 const DRY = Deno.args.includes("--dry-run");
-const BASE = "curriculums/math/by_topics/3_change_and_relationships";
+const BASE = "curriculums/en/math/by_topics/3_change_and_relationships";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
