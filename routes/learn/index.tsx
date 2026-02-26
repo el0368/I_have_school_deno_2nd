@@ -4,18 +4,11 @@ export default function LearnDashboard() {
   const subjects = [
     {
       title: "Mathematics",
-      desc: "Explore the complete K-12 math curriculum.",
+      emoji: "🔢",
+      desc: "22 topics — from counting to topology.",
       link: "/curriculum/math",
       active: true,
     },
-    {
-      title: "Computer Science",
-      desc: "Coming soon",
-      link: "#",
-      active: false,
-    },
-    { title: "Physics", desc: "Coming soon", link: "#", active: false },
-    { title: "History", desc: "Coming soon", link: "#", active: false },
   ];
 
   return (
@@ -23,15 +16,18 @@ export default function LearnDashboard() {
       <Head>
         <title>Learn | Sovereign Academy</title>
       </Head>
-      <div class="page-container">
-        <header class="page-header">
-          <h1 class="page-title">Learning Dashboard</h1>
-          <p class="page-subtitle">
+
+      <div class="subject-hero">
+        <div class="page-container" style="padding-top: 0; padding-bottom: 0;">
+          <h1 class="hero-large-title">Learn</h1>
+          <p class="hero-large-subtitle">
             Select a subject to view the curriculum and begin your journey.
           </p>
-        </header>
+        </div>
+      </div>
 
-        <div class="grid-container">
+      <div class="page-container">
+        <div class="grid-container" style="margin-top: -1.5rem;">
           {subjects.map((subject) => (
             <a
               href={subject.active ? subject.link : undefined}
@@ -39,8 +35,13 @@ export default function LearnDashboard() {
                 subject.active ? "is-active" : "is-dummy"
               }`}
             >
-              <h3 class="dashboard-card-title">{subject.title}</h3>
-              <p class="dashboard-card-desc">{subject.desc}</p>
+              <div class="group-card-body">
+                <div class="group-card-icon">{subject.emoji}</div>
+                <div class="group-card-text">
+                  <h3 class="dashboard-card-title">{subject.title}</h3>
+                  <p class="dashboard-card-desc">{subject.desc}</p>
+                </div>
+              </div>
             </a>
           ))}
         </div>

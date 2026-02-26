@@ -1,0 +1,45 @@
+---
+title: "Solving One-Step Equations"
+grade: "grade_8"
+topic: "07_variables_and_equations"
+unit: "unit_05_solving_equations_with_one_unknown"
+---
+
+# Solving One-Step Equations
+
+To solve an equation, we want to get the variable (like $x$) all by itself on one side of the equals sign. We do this by using **Inverse Operations**.
+
+### The Inverse Rule
+- The inverse of **Addition** is **Subtraction**.
+- The inverse of **Subtraction** is **Addition**.
+- The inverse of **Multiplication** is **Division**.
+- The inverse of **Division** is **Multiplication**.
+
+---
+
+## Interactive Practice
+
+This exercise is **Procedurally Generated**. Every time you refresh, the numbers will change, but the difficulty stays the same!
+
+<ProceduralExercise
+  id="one-step-add-sub"
+  type="numeric"
+  blueprint={{
+    variables: {
+      x: "random(1, 15)",
+      a: "random(1, 20)",
+      op: "choice(['+', '-'])"
+    },
+    equation: "op === '+' ? `x + ${a} = ${x + a}` : `x - ${a} = ${x - a}`",
+    solution: "x"
+  }}
+  question="Solve for $x$:"
+/>
+
+{/*
+  How the generator works (Answer-First):
+  1. It picks the answer 'x' first (1 to 15).
+  2. It picks a constant 'a' (1 to 20).
+  3. It calculates the result 'C' automatically.
+  4. The student always gets a clean integer answer!
+*/}

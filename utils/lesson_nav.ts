@@ -76,6 +76,101 @@ export function computeLessonNeighbors(
 }
 
 /**
+ * Derives the "Back to Topic Overview" URL from a lesson path.
+ *
+ * @example
+ *   topicOverviewLink("/learn/math/by_topics/1_the_core/01_number_sense_and_operations/unit_01/lesson_1")
+ *   // → "/curriculum/math/by_topics/1_the_core/01_number_sense_and_operations"
+ *
+ *   topicOverviewLink("/learn/something_unexpected")
+ *   // → "/curriculum/math"  (fallback)
+ */
+export function topicOverviewLink(lessonPath: string): string {
+  // Check for by_topics path
+  const topicMatch = lessonPath.match(
+    /^\/learn\/math\/by_topics\/([^\/]+)\/([^\/]+)/,
+  );
+  if (topicMatch) {
+    return `/curriculum/math/by_topics/${topicMatch[1]}/${topicMatch[2]}`;
+  }
+
+  // Check for by_grade path
+  const gradeMatch = lessonPath.match(
+    /^\/learn\/math\/by_grade\/([^\/]+)/,
+  );
+  if (gradeMatch) {
+    return `/curriculum/math/by_grade/${gradeMatch[1]}`;
+  }
+
+  return "/curriculum/math";
+}
+
+/**
+ * Converts a unit folder name (slug) into a human-readable display title.
+ * Strips the `unit_NN_` prefix and title-cases the remainder.
+ *
+ * @example
+ *   formatUnitTitle("unit_01_counting_and_place_value") → "Counting and Place Value"
+ *   formatUnitTitle("unit_02_addition_and_subtraction") → "Addition and Subtraction"
+ */
+export function formatUnitTitle(slug: string): string {
+  // Strip "unit_01_" style prefix
+  const s = slug.replace(/^unit_\d+_/, "");
+  return s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/**
+ * Converts a lesson filename (slug) into a human-readable display title.
+ *
+ * Rules applied in order:
+ *  1. If the slug starts with `unit_test_` or ends with `_unit_test`, prefix with "Unit Test: "
+ *  2. If the slug starts with `quiz_`, prefix with "Quiz: "
+ *  3. Strip leading sequence number: `01_`, `12_`, etc.
+ *  4. Replace underscores with spaces and title-case every word.
+ *
+ * @example
+ *   formatLessonTitle("01_count_with_small_numbers")   → "Count with Small Numbers"
+ *   formatLessonTitle("02_adding_within_20")           → "Adding within 20"
+ *   formatLessonTitle("quiz_01_addition_basics")       → "Quiz: Addition Basics"
+ *   formatLessonTitle("unit_test_addition_and_subtraction") → "Unit Test: Addition and Subtraction"
+ */
+export function formatLessonTitle(slug: string): string {
+  let s = slug;
+
+  // 1. Detect and strip quiz / unit_test markers
+  let prefix = "";
+  if (/^unit_test_/.test(s)) {
+    prefix = "Unit Test: ";
+    s = s.replace(/^unit_test_/, "");
+  } else if (/_unit_test$/.test(s)) {
+    prefix = "Unit Test: ";
+    s = s.replace(/_unit_test$/, "");
+  } else if (/^unit_quiz_/.test(s)) {
+    prefix = "Quiz: ";
+    s = s.replace(/^unit_quiz_/, "");
+  } else if (/^quiz_\d+_/.test(s)) {
+    prefix = "Quiz: ";
+    s = s.replace(/^quiz_\d+_/, "");
+  } else if (/^quiz_/.test(s)) {
+    prefix = "Quiz: ";
+    s = s.replace(/^quiz_/, "");
+  }
+
+  // 2. Strip leading sequence number, e.g. "01_", "12_"
+  s = s.replace(/^\d+_/, "");
+
+  // 3. Replace underscores with spaces, then title-case each word
+  const titled = s
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  return prefix + titled;
+}
+
+/**
+ * @deprecated Use topicOverviewLink for by_topics paths.
+ * Kept for backwards-compatibility with tests.
+ *
  * Derives the "Back to Grade Overview" URL from a lesson path.
  *
  * @example

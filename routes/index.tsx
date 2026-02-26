@@ -15,8 +15,8 @@ export default define.page(function Home() {
           </span>
         </h1>
         <p class="hero-large-subtitle">
-          A truly offline-first, comprehensive K-12 math curriculum designed for
-          deep intuition and independent learning.
+          A truly offline-first, comprehensive K-to-PhD math curriculum designed
+          for deep intuition and independent learning.
         </p>
 
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
@@ -25,7 +25,14 @@ export default define.page(function Home() {
             class="btn-primary"
             style="font-size: 1.125rem; padding: 0.75rem 2rem; border-radius: 9999px; text-decoration: none;"
           >
-            Enter Math Academy
+            Explore Math Curriculum
+          </a>
+          <a
+            href="/practice"
+            class="btn-primary"
+            style="font-size: 1.125rem; padding: 0.75rem 2rem; border-radius: 9999px; text-decoration: none; background: transparent; border: 2px solid var(--color-primary-light); color: var(--color-primary-light);"
+          >
+            Practice Arena
           </a>
         </div>
       </div>

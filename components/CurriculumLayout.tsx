@@ -1,6 +1,6 @@
 import { ComponentChildren } from "preact";
 import MarkCompleteButton from "../islands/MarkCompleteButton.tsx";
-import { gradeOverviewLink } from "../utils/lesson_nav.ts";
+import { formatLessonTitle, topicOverviewLink } from "../utils/lesson_nav.ts";
 
 interface Props {
   children: ComponentChildren;
@@ -16,18 +16,13 @@ export function CurriculumLayout(
 ) {
   const parts = path.split("/");
   const filename = parts[parts.length - 1];
-  const title = filename
-    ? filename.replace(/_/g, " ").replace(
-      /\b\w/g,
-      (char: string) => char.toUpperCase(),
-    )
-    : "Lesson";
+  const title = filename ? formatLessonTitle(filename) : "Lesson";
   const breadcrumb = parts.map((p: string) =>
     p.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
   ).filter(Boolean).join(" > ");
 
-  // Derive the grade overview link (e.g. /curriculum/math/grade_1)
-  const overviewLink = gradeOverviewLink(path);
+  // Derive the topic overview link (e.g. /curriculum/math/by_topics/1_the_core/01_number_sense_and_operations)
+  const overviewLink = topicOverviewLink(path);
 
   return (
     <>
@@ -36,10 +31,6 @@ export function CurriculumLayout(
       <div class="app-container">
         {/* Sidebar Navigation */}
         <nav class="sidebar">
-          <h2 class="sidebar-title">
-            SOVEREIGN ACADEMY
-          </h2>
-
           <div class="sidebar-navigation-items">
             <div class="sidebar-label">
               Location
@@ -51,7 +42,7 @@ export function CurriculumLayout(
 
           <div class="sidebar-footer">
             <a href={overviewLink} class="sidebar-link">
-              ← Back to Grade Overview
+              ← Back to Overview
             </a>
             <a
               href="/"

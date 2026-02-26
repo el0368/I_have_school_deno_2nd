@@ -1,37 +1,8 @@
-/**
- * split_unit_outlines.ts
- *
- * Splits every "Unit Outline" file (detected by `topic:` in frontmatter)
- * into individual lesson stub files, one per bullet point.
- *
- * Input file example (grade_5_02_adding_decimals.mdx):
- *   ---
- *   title: "Unit 2: Adding Decimals"
- *   grade: "grade_5"
- *   topic: "01_number_sense_and_operations"
- *   ---
- *   # Unit 2: Adding Decimals
- *   - Adding decimals using models
- *   - Adding decimals using place value
- *
- * Output (replaces the input file with):
- *   grade_5_01_adding_decimals_using_models.mdx
- *   grade_5_02_adding_decimals_using_place_value.mdx
- *   grade_5_unit_quiz_adding_decimals.mdx
- *   grade_5_unit_test_adding_decimals.mdx
- *
- * Usage:
- *   deno run -A scripts/split_unit_outlines.ts          ← dry run
- *   deno run -A scripts/split_unit_outlines.ts --apply  ← execute
- */
-
 import { walk } from "jsr:@std/fs@1/walk";
 import { dirname, join } from "jsr:@std/path@1";
 
 const DRY_RUN = !Deno.args.includes("--apply");
-const ROOT = "curriculums/en/math/by_topics";
-
-// ── helpers ──────────────────────────────────────────────────────────────────
+const ROOT = "curriculums";
 
 /** Convert a lesson title to a snake_case filename slug. */
 function toSlug(title: string): string {
@@ -43,9 +14,10 @@ function toSlug(title: string): string {
     .replace(/\s+/g, "_");
 }
 
-/** Extract a frontmatter value by key. Returns "" if not found. */
 function getFrontmatter(content: string, key: string): string {
-  const m = content.match(new RegExp(`^${key}:\\s*["']?([^"'\\n]+)["']?`, "m"));
+  const m = content.match(
+    new RegExp("^" + key + ":\\s*['\"]?([^'\"\\n]+)['\"]?", "m"),
+  );
   return m ? m[1].trim() : "";
 }
 
@@ -54,7 +26,7 @@ function parseBullets(content: string): string[] {
   return content
     .split("\n")
     .filter((l) => l.trimStart().startsWith("- "))
-    .map((l) => l.replace(/^[\s]*-\s+/, "").trim())
+    .map((l) => l.replace(/^[\\s]*-\\s+/, "").trim())
     .filter((l) => l.length > 0);
 }
 
@@ -62,18 +34,12 @@ function parseBullets(content: string): string[] {
  *  e.g. "unit_2_adding_decimals" → "adding_decimals"
  */
 function unitSlugFromFolder(folder: string): string {
-  // Remove leading "unit_N_" prefix
-  return folder.replace(/^unit_\d+_/, "");
+  return folder.replace(/^unit_\\d+_/, "");
 }
 
-/** Build the frontmatter + minimal body for a new lesson stub. */
-function lessonStub(
-  title: string,
-  grade: string,
-  unitFolder: string,
-): string {
+function lessonStub(title: string, grade: string, unitFolder: string): string {
   return `---
-title: "${title.replace(/"/g, '\\"')}"
+title: "${title.replace(/"/g, '"')}"
 grade: "${grade}"
 unit: "${unitFolder}"
 ---
@@ -84,14 +50,13 @@ unit: "${unitFolder}"
 `;
 }
 
-/** Build the frontmatter + minimal body for a quiz stub. */
 function quizStub(
   unitTitle: string,
   grade: string,
   unitFolder: string,
 ): string {
   return `---
-title: "Unit Quiz: ${unitTitle.replace(/"/g, '\\"')}"
+title: "Unit Quiz: ${unitTitle.replace(/"/g, '"')}"
 grade: "${grade}"
 unit: "${unitFolder}"
 ---
@@ -102,14 +67,13 @@ unit: "${unitFolder}"
 `;
 }
 
-/** Build the frontmatter + minimal body for a unit test stub. */
 function unitTestStub(
   unitTitle: string,
   grade: string,
   unitFolder: string,
 ): string {
   return `---
-title: "Unit Test: ${unitTitle.replace(/"/g, '\\"')}"
+title: "Unit Test: ${unitTitle.replace(/"/g, '"')}"
 grade: "${grade}"
 unit: "${unitFolder}"
 ---
@@ -120,11 +84,8 @@ unit: "${unitFolder}"
 `;
 }
 
-// ── main ─────────────────────────────────────────────────────────────────────
-
 interface Plan {
   sourceFile: string;
-  grade: string;
   unitFolder: string;
   unitTitle: string;
   newFiles: { path: string; content: string }[];
@@ -134,25 +95,19 @@ const plans: Plan[] = [];
 
 for await (const entry of walk(ROOT, { exts: [".mdx"] })) {
   const content = await Deno.readTextFile(entry.path);
-
-  // Only process Unit Outline files — those with `topic:` frontmatter
   if (!content.match(/^topic:/m)) continue;
 
   const grade = getFrontmatter(content, "grade");
   const rawTitle = getFrontmatter(content, "title");
-  // Strip "Unit N: " prefix to get the bare unit title
-  const unitTitle = rawTitle.replace(/^Unit \d+:\s*/i, "").trim();
-
+  const unitTitle = rawTitle.replace(/^Unit \\d+:\\s*/, "");
   const dir = dirname(entry.path);
-  const unitFolder = dir.split(/[/\\]/).at(-1) ?? "";
+  const unitFolder = dir.split(/[\\\\/]/).at(-1) ?? "";
   const unitSlug = unitSlugFromFolder(unitFolder);
 
   const bullets = parseBullets(content);
-  if (bullets.length === 0) continue; // nothing to split
+  if (bullets.length === 0) continue;
 
   const newFiles: { path: string; content: string }[] = [];
-
-  // One stub per lesson bullet
   bullets.forEach((title, i) => {
     const num = String(i + 1).padStart(2, "0");
     const filename = `${grade}_${num}_${toSlug(title)}.mdx`;
@@ -162,11 +117,11 @@ for await (const entry of walk(ROOT, { exts: [".mdx"] })) {
     });
   });
 
-  // Quiz + unit test at the end
   newFiles.push({
     path: join(dir, `${grade}_unit_quiz_${unitSlug}.mdx`),
     content: quizStub(unitTitle, grade, unitFolder),
   });
+
   newFiles.push({
     path: join(dir, `${grade}_unit_test_${unitSlug}.mdx`),
     content: unitTestStub(unitTitle, grade, unitFolder),
@@ -174,7 +129,6 @@ for await (const entry of walk(ROOT, { exts: [".mdx"] })) {
 
   plans.push({
     sourceFile: entry.path,
-    grade,
     unitFolder,
     unitTitle,
     newFiles,
@@ -182,44 +136,21 @@ for await (const entry of walk(ROOT, { exts: [".mdx"] })) {
 }
 
 if (plans.length === 0) {
-  console.log("✅ No Unit Outline files found — nothing to split.");
+  console.log("✅ No Unit Outline files found to split.");
   Deno.exit(0);
 }
 
-// ── report / execute ──────────────────────────────────────────────────────────
-
-console.log(
-  `\n${
-    DRY_RUN ? "🔍 DRY RUN — no files will be changed" : "✏️  APPLYING splits"
-  }\n`,
-);
-
+console.log(`\\n${DRY_RUN ? "��� DRY RUN" : "✏️  APPLYING"}\\n`);
 let totalNew = 0;
 
 for (const plan of plans) {
-  const shortSrc = plan.sourceFile.replace(ROOT + "/", "").replace(
-    ROOT + "\\",
-    "",
-  );
-  console.log(`\n📂 ${shortSrc}  (${plan.newFiles.length} files)`);
+  console.log(`��� ${plan.sourceFile}`);
   for (const f of plan.newFiles) {
-    const shortDest = f.path.replace(ROOT + "/", "").replace(ROOT + "\\", "");
-    console.log(`   + ${shortDest}`);
-    if (!DRY_RUN) {
-      await Deno.writeTextFile(f.path, f.content);
-    }
+    console.log(`  + ${f.path}`);
+    if (!DRY_RUN) await Deno.writeTextFile(f.path, f.content);
     totalNew++;
   }
-  if (!DRY_RUN) {
-    await Deno.remove(plan.sourceFile);
-    console.log(`   ✗ deleted source`);
-  }
+  if (!DRY_RUN) await Deno.remove(plan.sourceFile);
 }
 
-console.log(
-  `\n${
-    DRY_RUN
-      ? `📋 ${plans.length} Unit Outline files → ${totalNew} new lesson files.\n   Run with --apply to execute:\n   deno run -A scripts/split_unit_outlines.ts --apply`
-      : `✅ Done. ${plans.length} outlines split into ${totalNew} lesson stubs.`
-  }\n`,
-);
+console.log(`\\nDone. ${plans.length} outlines -> ${totalNew} lesson stubs.`);
