@@ -18,9 +18,9 @@ export default function MathCurriculum() {
 
       <main
         class="page-container"
-        style="padding-top: var(--spacing-8); padding-bottom: var(--spacing-10); margin-top: -1.5rem;"
+        style="padding-bottom: var(--spacing-10);"
       >
-        <div class="grid-container">
+        <div class="grid-container" style="margin-top: -1.5rem;">
           <a
             href="/curriculum/math/by_grade"
             class="dashboard-card"

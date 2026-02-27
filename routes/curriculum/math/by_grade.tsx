@@ -81,7 +81,7 @@ export default function MathByGrade() {
 
       <main
         class="page-container"
-        style="padding-top: var(--spacing-8); padding-bottom: var(--spacing-10); margin-top: -1.5rem;"
+        style="padding-top: var(--spacing-8); padding-bottom: var(--spacing-10);"
       >
         <div style="margin-bottom: var(--spacing-6);">
           <a

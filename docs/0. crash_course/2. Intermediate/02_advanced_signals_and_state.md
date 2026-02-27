@@ -1,0 +1,322 @@
+# ================================================================================ MODULE 2: ADVANCED SIGNALS & STATE MANAGEMENT
+
+Estimated Time: 40 minutes Prerequisites: Module 2 of Beginner (Islands
+Architecture, basic signal()) Learning Objectives:
+
+- Understand WHY signal() and useSignal() exist as separate things
+- Derive values automatically with computed()
+- Run side-effects on signal changes with effect()
+- Avoid wasted renders with batch()
+- Share state between two separate Islands using a shared module
+- # Manage form state cleanly with a signals-based pattern
+
+You used signal() in the Beginner level to make Counter work. Now we go deeper.
+The building blocks: signal, computed, effect, batch.
+
+---
+
+## LESSON 1: THE FULL SIGNALS API
+
+Import all four from @preact/signals:
+
+import { signal, computed, effect, batch } from "@preact/signals";
+
+Quick summary of the four:
+
+FUNCTION PURPOSE WHEN IT RUNS
+
+---
+
+signal(v) Create a piece of reactive state You initialise it computed(fn) Derive
+a value from other signals Auto, when deps change effect(fn) Run a side-effect
+when signals change Auto, when deps change batch(fn) Group multiple signal
+updates You call it manually
+
+---
+
+## LESSON 2: signal() — A DEEPER LOOK
+
+You already know this, but let's cement it:
+
+const count = signal(0); // Create signal with initial value 0
+
+// Read it: count.value; // 0 (always use .value outside JSX)
+
+// In JSX, Preact auto-reads .value for you:
+
+<p>{count}</p>            // ✓ same as {count.value}
+
+// Write it: count.value = 5; // Triggers re-render of anything using count
+count.value += 1; // Increment
+
+SIGNAL vs USESGNAL (THE CRITICAL DISTINCTION): Both create a signal, but use
+them in DIFFERENT places:
+
+CONTEXT USE THIS WHY
+
+---
+
+Top of a .tsx Island file useSignal(0) Hook — managed by Preact lifecycle Inside
+a function component useSignal(0) Hook — needs component context At MODULE level
+(.ts file) signal(0) Plain object — no component context In an MDX file (.mdx)
+signal(0) Top of .mdx = module scope, not JSX
+
+The rule: if you are INSIDE a function that Preact calls (a component), use
+useSignal(). If you are OUTSIDE any function (module top-level), use signal().
+
+islands/Counter.tsx uses `count` as a PROP (passed in from the parent page).
+routes/index.tsx creates the signal with `signal(3)` at page-render time.
+routes/testmdx.mdx uses `signal(3)` at module level — NOT useSignal().
+
+---
+
+## LESSON 3: computed() — AUTOMATIC DERIVED VALUES
+
+`computed()` creates a READ-ONLY signal whose value is automatically
+recalculated whenever its dependencies (other signals it reads) change.
+
+EXAMPLE: Shopping cart total
+
+const items = signal([ { name: "Apple", price: 1.5, qty: 3 }, { name: "Banana",
+price: 0.75, qty: 6 }, ]);
+
+// This AUTOMATICALLY stays in sync with items: const total = computed(() =>
+items.value.reduce((sum, item) => sum + item.price * item.qty, 0) );
+
+console.log(total.value); // 9.0 items.value = [...items.value, { name:
+"Cherry", price: 2.0, qty: 1 }]; console.log(total.value); // 11.0 <-- updated
+automatically, no extra code
+
+WHY NOT JUST CALCULATE IN RENDER? If you wrote
+`const total = items.value.reduce(...)` inside the component body, it
+recalculates on EVERY render. computed() only recalculates when `items` actually
+changes. This is an optimization AND cleaner code.
+
+PRACTICAL EXAMPLE — Notes app: const notes = signal<Note[]>([]); const noteCount
+= computed(() => notes.value.length); const hasNotes = computed(() =>
+notes.value.length > 0); const sortedNotes = computed(() =>
+[...notes.value].sort((a, b) => b.createdAt.localeCompare(a.createdAt)) );
+
+// In JSX:
+
+<p>You have {noteCount} notes</p>
+  {hasNotes.value && <NoteList notes={sortedNotes.value} />}
+
+computed() is READ-ONLY. You can never write to computed.value directly. If you
+try: TypeError: Cannot set properties of a computed signal
+
+---
+
+## LESSON 4: effect() — SIDE-EFFECTS ON SIGNAL CHANGES
+
+`effect()` runs a function immediately AND re-runs it whenever any signal it
+READ inside changes.
+
+EXAMPLE: localStorage sync:
+
+const theme = signal("light");
+
+// This runs once immediately, then again whenever theme.value changes:
+effect(() => { localStorage.setItem("theme", theme.value);
+document.body.className = theme.value; });
+
+theme.value = "dark"; // effect() automatically runs: sets localStorage AND body
+class
+
+CLEANUP: effect() returns a "dispose" function. Call it to stop the effect:
+const stop = effect(() => { console.log(count.value); }); stop(); //
+Unsubscribes — the effect will never run again
+
+WHERE TO USE IN FRESH: In Fresh Islands, put effect() INSIDE the component or at
+the module top-level of the island file (NOT inside JSX). The most common use:
+syncing to localStorage or logging.
+
+import { signal, effect } from "@preact/signals";
+
+const query = signal("");
+
+// Auto-fetch whenever query changes (debounced in a real app): effect(() => {
+if (query.value.length > 2) { fetch(`/api/search?q=${query.value}`) .then(r =>
+r.json()) .then(data => { results.value = data; }); } });
+
+WARNING — INFINITE LOOPS: DO NOT write to a signal inside an effect that reads
+the same signal: effect(() => { count.value = count.value + 1; // INFINITE LOOP
+— each write triggers re-run! });
+
+---
+
+## LESSON 5: batch() — GROUPING UPDATES
+
+When you update multiple signals, Preact normally re-renders after EACH update.
+`batch()` delays all re-renders until the batch function completes:
+
+Without batch (2 re-renders): firstName.value = "Alice"; // render 1
+lastName.value = "Smith"; // render 2
+
+With batch (1 re-render): batch(() => { firstName.value = "Alice";
+lastName.value = "Smith"; }); // render 1 (happens once after both writes)
+
+In a real app with many signals (e.g. loading a list of notes from an API),
+batch() prevents the UI from flickering through intermediate states.
+
+EXAMPLE — Loading state: const isLoading = signal(true); const notes =
+signal<Note[]>([]); const error = signal<string | null>(null);
+
+async function loadNotes() { isLoading.value = true; try { const data = await
+fetch("/api/notes").then(r => r.json()); batch(() => { // Single render with all
+three updates: notes.value = data; isLoading.value = false; error.value = null;
+}); } catch (e) { batch(() => { error.value = (e as Error).message;
+isLoading.value = false; }); } }
+
+---
+
+## LESSON 6: SHARING STATE BETWEEN TWO ISLANDS
+
+Problem: Two separate Islands on the same page need the same piece of state.
+Fresh renders each Island independently — they cannot pass props to each other.
+
+SOLUTION: Use a SHARED SIGNALS MODULE.
+
+Create: signals/notesStore.ts import { signal, computed } from
+"@preact/signals";
+
+export interface Note { id: string; text: string; }
+
+// Single source of truth — exported signals export const notes =
+signal<Note[]>([]); export const noteCount = computed(() => notes.value.length);
+
+export function addNote(text: string) { const newNote: Note = { id:
+crypto.randomUUID(), text }; notes.value = [...notes.value, newNote]; }
+
+export function removeNote(id: string) { notes.value = notes.value.filter(n =>
+n.id !== id); }
+
+islands/NoteInput.tsx (Island 1): import { useSignal } from "@preact/signals";
+import { addNote } from "../signals/notesStore.ts";
+
+export default function NoteInput() { const draft = useSignal(""); return (
+
+<div> <input value={draft} onInput={(e) => { draft.value =
+e.currentTarget.value; }} /> <button onClick={() => { addNote(draft.value);
+draft.value = ""; }}>Add</button>
+</div> ); }
+
+islands/NoteList.tsx (Island 2): import { notes, removeNote } from
+"../signals/notesStore.ts";
+
+export default function NoteList() { return (
+
+<ul> {notes.value.map(note => (
+<li key={note.id}> {note.text} <button onClick={() =>
+removeNote(note.id)}>Delete</button>
+</li> ))}
+</ul> ); }
+
+Now when Island 1 calls addNote(), Island 2 automatically re-renders. Both
+Islands share the exact same signal objects because JavaScript module imports
+are SINGLETONS — the module is only loaded once.
+
+---
+
+## LESSON 7: FORM STATE PATTERN
+
+Managing form state cleanly with Signals:
+
+// islands/ContactForm.tsx import { useSignal, batch } from "@preact/signals";
+
+interface FormState { name: string; email: string; message: string; }
+
+const emptyForm: FormState = { name: "", email: "", message: "" };
+
+export default function ContactForm() { const form =
+useSignal<FormState>(emptyForm); const errors =
+useSignal<Partial<FormState>>({}); const submitted = useSignal(false);
+
+    function validate(): boolean {
+      const errs: Partial<FormState> = {};
+      if (!form.value.name)    errs.name    = "Name is required";
+      if (!form.value.email)   errs.email   = "Email is required";
+      if (!form.value.message) errs.message = "Message is required";
+      errors.value = errs;
+      return Object.keys(errs).length === 0;
+    }
+
+    async function handleSubmit(e: Event) {
+      e.preventDefault();
+      if (!validate()) return;
+
+      await fetch("/api/contact", {
+        method: "POST",
+        body: JSON.stringify(form.value),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      batch(() => {
+        form.value      = emptyForm;   // Reset form
+        submitted.value = true;        // Show success
+      });
+    }
+
+    if (submitted.value) return <p>Thanks! We'll be in touch.</p>;
+
+    return (
+      <form onSubmit={handleSubmit}>
+        <input value={form.value.name}
+               onInput={(e) => form.value = { ...form.value, name: e.currentTarget.value }} />
+        {errors.value.name && <span>{errors.value.name}</span>}
+        {/* ... more fields ... */}
+        <button type="submit">Send</button>
+      </form>
+    );
+
+}
+
+KEY PATTERNS HERE:
+
+- Single `form` signal for the whole form object (not one signal per field)
+- Spread operator to update one field: { ...form.value, name: newVal }
+- batch() to reset form + show success message in one render
+- validate() returns boolean and sets errors signal as a side effect
+
+---
+
+## QUICK REFERENCE
+
+API SYNTAX KEY PROPERTY
+
+---
+
+signal(v) const s = signal(0) s.value (read/write) computed(fn) const c =
+computed(() => ...) c.value (READ-ONLY) effect(fn) effect(() => { ... }) returns
+dispose() batch(fn) batch(() => { ... }) groups writes → 1 render useSignal(v)
+useSignal(0) [inside component] same as signal, hook-managed
+
+MODULE-LEVEL signal() ← safe at top of .ts/.mdx files COMPONENT-LEVEL
+useSignal() ← safe inside function components
+
+SHARING STATE: Export signals from a shared .ts module (singleton pattern) FORM
+STATE: One signal object + spread operator for field updates
+
+---
+
+## MINI QUIZ
+
+1. You have `const double = computed(() => count.value * 2)`. You try
+   `double.value = 10`. What happens? A) double becomes 10 B) TypeError:
+   computed() signal is read-only C) count.value becomes 5 D) Nothing happens
+
+2. You are at the TOP LEVEL of an MDX file (not inside a function). Which signal
+   creation function should you use? A) useSignal() B) signal() C) computed() D)
+   Either — they are the same
+
+3. You update 3 signals in a row without batch(). How many re-renders happen? A)
+   1 B) 2 C) 3 D) 0
+
+4. You have two Islands that need to share state. What is the correct pattern?
+   A) Pass state via a regular HTML data attribute B) Use localStorage and read
+   it in each Island C) Export signals from a shared module imported by both
+   Islands D) Post a message via window.postMessage
+
+Answers: 1-B, 2-B, 3-C, 4-C
+
+================================================================================

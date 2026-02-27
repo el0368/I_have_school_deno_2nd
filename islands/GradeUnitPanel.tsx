@@ -163,50 +163,31 @@ export default function GradeUnitPanel(
                         {lessons.length} lessons
                       </span>
                     </div>
-                    <div class="unit-content-list">
-                      {lessons.map((lesson) => (
-                        <a href={lesson.path} class="unit-item">
-                          <svg
-                            class="unit-item-icon"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                              clip-rule="evenodd"
-                            />
-                          </svg>
-                          <span class="unit-item-text">
-                            {formatLessonTitle(lesson.name)}
-                          </span>
-                        </a>
-                      ))}
-                      {quizzes.map((lesson) => (
-                        <a
-                          href={lesson.path}
-                          class="unit-item unit-item--practice"
-                        >
-                          <svg
-                            class="unit-item-icon practice"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                            <path
-                              fill-rule="evenodd"
-                              d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                              clip-rule="evenodd"
-                            />
-                          </svg>
-                          <div class="unit-item-content">
+                    <div class="unit-content-wrapper">
+                      <div class="unit-lessons-col">
+                        {lessons.map((lesson) => (
+                          <a href={lesson.path} class="unit-item">
                             <span class="unit-item-text">
                               {formatLessonTitle(lesson.name)}
                             </span>
-                            <span class="unit-item-subtext">Practice</span>
-                          </div>
-                        </a>
-                      ))}
+                          </a>
+                        ))}
+                      </div>
+                      {quizzes.length > 0 && (
+                        <div class="unit-quizzes-col">
+                          <div class="unit-quizzes-label">Quiz &amp; Test</div>
+                          {quizzes.map((lesson) => (
+                            <a
+                              href={lesson.path}
+                              class="unit-item unit-item--quiz"
+                            >
+                              <span class="unit-item-text">
+                                {formatLessonTitle(lesson.name)}
+                              </span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -247,50 +228,28 @@ export default function GradeUnitPanel(
                   )}
                 </div>
 
-                <div class="unit-content-list">
-                  {lessons.map((lesson) => (
-                    <a href={lesson.path} class="unit-item">
-                      <svg
-                        class="unit-item-icon"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                      <span class="unit-item-text">
-                        {formatLessonTitle(lesson.name)}
-                      </span>
-                    </a>
-                  ))}
-                  {quizzes.map((lesson) => (
-                    <a
-                      href={lesson.path}
-                      class="unit-item unit-item--practice"
-                    >
-                      <svg
-                        class="unit-item-icon practice"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                        <path
-                          fill-rule="evenodd"
-                          d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                      <div class="unit-item-content">
+                <div class="unit-content-wrapper">
+                  <div class="unit-lessons-col">
+                    {lessons.map((lesson) => (
+                      <a href={lesson.path} class="unit-item">
                         <span class="unit-item-text">
                           {formatLessonTitle(lesson.name)}
                         </span>
-                        <span class="unit-item-subtext">Practice</span>
-                      </div>
-                    </a>
-                  ))}
+                      </a>
+                    ))}
+                  </div>
+                  {quizzes.length > 0 && (
+                    <div class="unit-quizzes-col">
+                      <div class="unit-quizzes-label">Quiz &amp; Test</div>
+                      {quizzes.map((lesson) => (
+                        <a href={lesson.path} class="unit-item unit-item--quiz">
+                          <span class="unit-item-text">
+                            {formatLessonTitle(lesson.name)}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div class="unit-panel-nav">

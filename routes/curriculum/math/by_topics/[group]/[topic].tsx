@@ -1,37 +1,44 @@
 import { define } from "../../../../../utils.ts";
 import { Head } from "fresh/runtime";
-
-function formatUnitTitle(name: string): string {
-  return name
-    .replace(/^unit_\d+_/, "")
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
+import GradeUnitPanel from "../../../../../islands/GradeUnitPanel.tsx";
 
 export default define.page(async function TopicOverview(ctx) {
   const group = ctx.params.group;
   const topic = ctx.params.topic;
-  const curriculumPath = `curriculums/en/math/by_topics/${group}/${topic}`;
+  const topicPath = `curriculums/en/math/by_topics/${group}/${topic}`;
 
-  const units: { name: string; lessonCount: number }[] = [];
+  const unitsMap = new Map<string, { name: string; path: string }[]>();
 
   try {
-    for await (const dirEntry of Deno.readDir(curriculumPath)) {
-      if (dirEntry.isDirectory) {
-        let lessonCount = 0;
-        for await (
-          const fileEntry of Deno.readDir(`${curriculumPath}/${dirEntry.name}`)
-        ) {
-          if (
-            fileEntry.isFile && fileEntry.name.endsWith(".mdx") &&
-            !fileEntry.name.includes("quiz") &&
-            !fileEntry.name.includes("test")
-          ) {
-            lessonCount++;
-          }
+    for await (const unitEntry of Deno.readDir(topicPath)) {
+      if (!unitEntry.isDirectory) continue;
+      const unitName = unitEntry.name;
+      const unitPath = `${topicPath}/${unitName}`;
+      const lessons: { name: string; path: string }[] = [];
+
+      for await (const fileEntry of Deno.readDir(unitPath)) {
+        if (fileEntry.isFile && fileEntry.name.endsWith(".mdx")) {
+          const lessonName = fileEntry.name.replace(".mdx", "");
+          const routePath =
+            `/learn/en/math/by_topics/${group}/${topic}/${unitName}/${lessonName}`;
+          lessons.push({ name: lessonName, path: routePath });
         }
-        units.push({ name: dirEntry.name, lessonCount });
       }
+
+      lessons.sort((a, b) => {
+        const getWeight = (name: string) => {
+          if (name.includes("introduction")) return -1;
+          if (name.includes("quiz") || name.includes("test")) return 1000;
+          const match = name.match(/^(\d+)/);
+          return match ? parseInt(match[1]) : 999;
+        };
+        const wa = getWeight(a.name);
+        const wb = getWeight(b.name);
+        if (wa !== wb) return wa - wb;
+        return a.name.localeCompare(b.name);
+      });
+
+      unitsMap.set(unitName, lessons);
     }
   } catch (_e) {
     return (
@@ -48,10 +55,36 @@ export default define.page(async function TopicOverview(ctx) {
     );
   }
 
+  if (unitsMap.size === 0) {
+    return (
+      <div
+        class="page-container"
+        style="padding: 4rem 2rem; text-align: center;"
+      >
+        <p style="font-size: 1.25rem; color: var(--color-text-muted);">
+          No units yet — check back soon!
+        </p>
+        <a
+          href="/curriculum/math/by_topics"
+          style="display:inline-block;margin-top:1.5rem;text-decoration:none;color:var(--color-primary);font-weight:bold;"
+        >
+          ← Back to Topics
+        </a>
+      </div>
+    );
+  }
+
+  const units: { name: string; lessons: { name: string; path: string }[] }[] =
+    [];
+  for (const [name, lessons] of unitsMap.entries()) {
+    units.push({ name, lessons });
+  }
+
   units.sort((a, b) => {
-    const numA = parseInt(a.name.match(/unit_(\d+)/)?.[1] || "0");
-    const numB = parseInt(b.name.match(/unit_(\d+)/)?.[1] || "0");
-    return numA - numB;
+    const numA = parseInt(a.name.match(/unit_(\d+)/)?.[1] || "999");
+    const numB = parseInt(b.name.match(/unit_(\d+)/)?.[1] || "999");
+    if (numA !== numB) return numA - numB;
+    return a.name.localeCompare(b.name);
   });
 
   const formattedTopicTitle = topic
@@ -59,49 +92,28 @@ export default define.page(async function TopicOverview(ctx) {
     .replace(/_/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
-  const totalLessons = units.reduce((acc, u) => acc + u.lessonCount, 0);
+  const totalLessons = units.reduce(
+    (acc, u) =>
+      acc +
+      u.lessons.filter(
+        (l) => !l.name.includes("quiz") && !l.name.includes("test"),
+      ).length,
+    0,
+  );
 
   return (
     <>
       <Head>
         <title>{formattedTopicTitle} | Sovereign Academy</title>
       </Head>
-
-      <div class="subject-hero">
-        <div class="page-container" style="padding-top:0;padding-bottom:0;">
-          <h1 class="hero-large-title">{formattedTopicTitle}</h1>
-          <p class="hero-large-subtitle">
-            {units.length} units · {totalLessons} lessons
-          </p>
-        </div>
-      </div>
-
-      <main
-        class="page-container"
-        style="padding-top: var(--spacing-8); padding-bottom: var(--spacing-10); margin-top: -1.5rem;"
-      >
-        <div style="margin-bottom: var(--spacing-6);">
-          <a
-            href="/curriculum/math/by_topics"
-            style="display:inline-block;text-decoration:none;color:var(--color-primary);font-weight:bold;"
-          >
-            ← Back to Topics
-          </a>
-        </div>
-
-        <div class="unit-topic-grid">
-          {units.map((u, i) => (
-            <a
-              href={`/curriculum/math/by_topics/${group}/${topic}/${u.name}`}
-              class="unit-topic-card"
-            >
-              <span class="unit-topic-number">Unit {i + 1}</span>
-              <span class="unit-topic-title">{formatUnitTitle(u.name)}</span>
-              <span class="unit-topic-count">{u.lessonCount} lessons</span>
-            </a>
-          ))}
-        </div>
-      </main>
+      <GradeUnitPanel
+        units={units}
+        grade={topic}
+        gradeTitle={formattedTopicTitle}
+        totalLessons={totalLessons}
+        backLink="/curriculum/math/by_topics"
+        backLabel="Back to Topics"
+      />
     </>
   );
 });

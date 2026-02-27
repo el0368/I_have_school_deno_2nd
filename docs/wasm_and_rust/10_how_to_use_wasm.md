@@ -1,0 +1,47 @@
+# ================================================================================ HOW TO USE WEBASSEMBLY (WASM)
+
+WASM is a binary format that allows languages like Rust, C++, and Zig to run at
+near-native speed in Deno or the browser. You don't "install" WASM itself;
+instead, you "produce" or "import" it.
+
+---
+
+1. INSTALLING THE TOOLS (TO BUILD YOUR OWN)
+
+---
+
+If you want to write your own WASM logic using Rust (the most popular choice):
+
+- START WITH RUST: Download and install from: https://rustup.rs/
+
+- INSTALL WASM-PACK: Run this in your terminal: `cargo install wasm-pack` This
+  tool handles the complex part of turning Rust code into a .wasm file that Deno
+  and the browser can understand.
+
+---
+
+2. THE BASIC WORKFLOW (RUST TO DENO)
+
+---
+
+1. CREATE A LIB: `cargo new --lib my-logic`
+2. WRITE CODE: Add `#[wasm_bindgen]` to functions you want to share with JS.
+3. COMPILE: Run `wasm-pack build --target web`
+4. IMPORT: Move the resulting .wasm file to your project's /static folder.
+5. LOAD: Use `WebAssembly.instantiateStreaming()` in your TypeScript code.
+
+---
+
+3. USING PRE-BUILT LIBRARIES
+
+---
+
+Most of the time, you will just use libraries that already have WASM inside:
+
+- EXAMPLE: To use an ultra-fast SQLite database in Deno:
+  `import { DB } from "https://deno.land/x/sqlite/mod.ts";`
+
+The library will automatically fetch and load the required .wasm file when the
+application starts.
+
+================================================================================

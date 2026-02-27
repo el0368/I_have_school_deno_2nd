@@ -2,26 +2,46 @@ import { Head } from "fresh/runtime";
 
 const MATH_GROUPS = [
   {
-    id: "1_the_core",
-    title: "The Core",
+    id: "1_quantity",
+    title: "Quantity",
     emoji: "🔢",
     topics: [
+      { name: "Counting & Place Value", id: "01_counting_and_place_value" },
+      { name: "Addition & Subtraction", id: "02_addition_and_subtraction" },
       {
-        name: "Number Sense & Operations",
-        id: "01_number_sense_and_operations",
+        name: "Multiplication & Division",
+        id: "03_multiplication_and_division",
       },
-      { name: "Fractions & Proportions", id: "02_fractions_and_proportions" },
-      { name: "Patterns & Rules", id: "03_patterns_and_rules" },
+      { name: "Fractions", id: "04_fractions" },
+      { name: "Decimals", id: "05_decimals" },
+      {
+        name: "Ratios & Proportional Reasoning",
+        id: "06_ratios_and_proportional_reasoning",
+      },
+      {
+        name: "Integers & Rational Numbers",
+        id: "07_integers_and_rational_numbers",
+      },
     ],
   },
   {
-    id: "2_space_and_measurement",
-    title: "Space & Measurement",
+    id: "2_space_and_shape",
+    title: "Space & Shape",
     emoji: "📐",
     topics: [
-      { name: "Measurement & Scale", id: "04_measurement_and_scale" },
-      { name: "Geometric Reasoning", id: "05_geometric_reasoning" },
-      { name: "Trigonometry & Waves", id: "06_trigonometry_and_waves" },
+      { name: "Shapes & Spatial Sense", id: "01_shapes_and_spatial_sense" },
+      { name: "Measurement & Units", id: "02_measurement_and_units" },
+      { name: "Area, Perimeter & Volume", id: "03_area_perimeter_volume" },
+      { name: "Coordinate Geometry", id: "04_coordinate_geometry" },
+      {
+        name: "Transformations & Symmetry",
+        id: "05_transformations_and_symmetry",
+      },
+      {
+        name: "Geometric Proof & Reasoning",
+        id: "06_geometric_proof_and_reasoning",
+      },
+      { name: "Trigonometry", id: "07_trigonometry" },
     ],
   },
   {
@@ -29,9 +49,16 @@ const MATH_GROUPS = [
     title: "Change & Relationships",
     emoji: "📈",
     topics: [
-      { name: "Variables & Equations", id: "07_variables_and_equations" },
-      { name: "Functions & Graphs", id: "08_functions_and_graphs" },
-      { name: "Systems & Matrices", id: "09_systems_and_matrices" },
+      {
+        name: "Patterns & Algebraic Thinking",
+        id: "01_patterns_and_algebraic_thinking",
+      },
+      {
+        name: "Expressions & Equations",
+        id: "02_expressions_and_equations",
+      },
+      { name: "Functions & Graphs", id: "03_functions_and_graphs" },
+      { name: "Systems of Equations", id: "07_systems_of_equations" },
     ],
   },
   {
@@ -40,51 +67,73 @@ const MATH_GROUPS = [
     emoji: "🎲",
     topics: [
       {
-        name: "Probability & Combinatorics",
-        id: "10_probability_and_combinatorics",
+        name: "Collecting & Displaying Data",
+        id: "01_collecting_and_displaying_data",
+      },
+      { name: "Descriptive Statistics", id: "02_descriptive_statistics" },
+      {
+        name: "Probability Fundamentals",
+        id: "03_probability_fundamentals",
       },
       {
-        name: "Statistics & Data Science",
-        id: "11_statistics_and_data_science",
+        name: "Distributions & Inference",
+        id: "04_distributions_and_inference",
+      },
+      {
+        name: "Combinatorics & Counting",
+        id: "05_combinatorics_and_counting",
       },
     ],
   },
   {
-    id: "5_continuous_mathematics",
-    title: "Continuous Mathematics",
+    id: "5_calculus",
+    title: "Calculus",
     emoji: "∞",
     topics: [
-      { name: "Limits & Continuity", id: "12_limits_and_continuity" },
-      { name: "Differential Calculus", id: "13_differential_calculus" },
-      { name: "Integral Calculus", id: "14_integral_calculus" },
-      {
-        name: "Multivariable & Vector Calculus",
-        id: "15_multivariable_and_vector_calculus",
-      },
-      { name: "Differential Equations", id: "16_differential_equations" },
+      { name: "Limits & Continuity", id: "01_limits_and_continuity" },
+      { name: "Differential Calculus", id: "02_differential_calculus" },
+      { name: "Integral Calculus", id: "03_integral_calculus" },
+      { name: "Series & Sequences", id: "04_series_and_sequences" },
+      { name: "Multivariable Calculus", id: "05_multivariable_calculus" },
+      { name: "Differential Equations", id: "06_differential_equations" },
     ],
   },
   {
-    id: "6_discrete_mathematics",
+    id: "6_linear_algebra",
+    title: "Linear Algebra",
+    emoji: "🧮",
+    topics: [
+      { name: "Vectors & Spaces", id: "01_vectors_and_spaces" },
+      { name: "Matrix Operations", id: "02_matrix_operations" },
+      { name: "Linear Transformations", id: "03_linear_transformations" },
+      {
+        name: "Eigenvalues & Eigenvectors",
+        id: "04_eigenvalues_and_eigenvectors",
+      },
+      { name: "Applications", id: "05_applications" },
+    ],
+  },
+  {
+    id: "7_discrete_mathematics",
     title: "Discrete Mathematics",
     emoji: "🔗",
     topics: [
-      { name: "Logic & Set Theory", id: "17_logic_and_set_theory" },
-      {
-        name: "Number Theory & Cryptography",
-        id: "18_number_theory_and_cryptography",
-      },
-      { name: "Graph Theory", id: "19_graph_theory" },
+      { name: "Logic & Proof", id: "01_logic_and_proof" },
+      { name: "Set Theory", id: "02_set_theory" },
+      { name: "Graph Theory", id: "03_graph_theory" },
+      { name: "Number Theory", id: "04_number_theory" },
+      { name: "Advanced Combinatorics", id: "05_advanced_combinatorics" },
     ],
   },
   {
-    id: "7_formal_proofs_and_abstraction",
-    title: "Formal Proofs & Abstraction",
+    id: "8_abstract_and_pure_mathematics",
+    title: "Abstract & Pure Mathematics",
     emoji: "🧩",
     topics: [
-      { name: "Real & Complex Analysis", id: "20_real_and_complex_analysis" },
-      { name: "Abstract Algebra", id: "21_abstract_algebra" },
-      { name: "Topology", id: "22_topology" },
+      { name: "Real Analysis", id: "01_real_analysis" },
+      { name: "Complex Analysis", id: "02_complex_analysis" },
+      { name: "Abstract Algebra", id: "03_abstract_algebra" },
+      { name: "Topology", id: "04_topology" },
     ],
   },
 ];
@@ -100,14 +149,14 @@ export default function MathByTopics() {
         <div class="page-container" style="padding-top: 0; padding-bottom: 0;">
           <h1 class="hero-large-title">Math by Topics</h1>
           <p class="hero-large-subtitle">
-            22 topics — from counting to topology
+            43 topics — from counting to topology
           </p>
         </div>
       </div>
 
       <main
         class="page-container"
-        style="padding-top: var(--spacing-8); padding-bottom: var(--spacing-10); margin-top: -1.5rem;"
+        style="padding-top: var(--spacing-8); padding-bottom: var(--spacing-10);"
       >
         <div style="margin-bottom: var(--spacing-6);">
           <a
@@ -126,7 +175,7 @@ export default function MathByTopics() {
                 <div class="group-card-text">
                   <h2
                     class="dashboard-card-title"
-                    style="color: var(--color-primary); margin-bottom: var(--spacing-3);"
+                    style="color: var(--color-primary); margin-bottom: var(--spacing-4);"
                   >
                     {group.title}
                   </h2>

@@ -1,0 +1,61 @@
+# ================================================================================ CAN JS/TS COMPILE TO WASM?
+
+To answer your question: **Generally, No.**
+
+JavaScript and TypeScript are "High-Level" languages, while WASM is for
+"Low-Level" binary code. They are designed for different jobs.
+
+---
+
+1. THE FUNDAMENTAL DIFFERENCE
+
+---
+
+- JAVASCRIPT / TYPESCRIPT: These are "Garbage Collected" and "Dynamic." They
+  need a complex engine (like V8) to manage memory and decide what data types
+  are being used while the program is running.
+
+- WASM: This is "Manual" and "Static." It expects the programmer to manage
+  memory and define exactly what every piece of data is before it runs.
+
+Because JS/TS are so "smart" and "flexible," they carry too much extra weight to
+be turned into a simple, fast WASM binary.
+
+---
+
+2. THE EXCEPTION: ASSEMBLYSCRIPT
+
+---
+
+There is a special language called **AssemblyScript**.
+
+- It looks exactly like TypeScript.
+- BUT it has strict rules (for example, you must define if a number is an
+  integer or a decimal).
+- IT COMPILES TO WASM.
+
+This is the only way to write "TypeScript-ish" code and get a `.wasm` file.
+
+---
+
+3. THE MAGIC OF THE "GLUE"
+
+---
+
+Instead of turning JS/TS into WASM, we usually do the opposite:
+
+1. We use **Rust or C++** for the heavy math/logic (.wasm).
+2. We use **JavaScript or TypeScript** to talk to the browser's screen
+   (.js/.ts).
+
+Think of it like a car:
+
+- The **WASM** is the powerful Engine (Rust/C++).
+- The **JavaScript** is the Dashboard and the Steering Wheel.
+
+You need both to drive, but you wouldn't try to build a steering wheel out of
+engine pistons!
+
+---
+
+# SUMMARY: Standard Javascript and TypeScript cannot be turned into WASM. They are the "Control Room" that manages the WASM "Engines."

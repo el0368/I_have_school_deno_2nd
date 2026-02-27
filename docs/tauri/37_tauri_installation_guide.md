@@ -1,0 +1,79 @@
+# ================================================================================ TAURI 2.0: INSTALLATION GUIDE (WINDOWS)
+
+Since you are on Windows and already have Rust installed, you are 80% of the way
+there! Here is the step-by-step guide to getting Tauri 2.0 ready.
+
+---
+
+1. SYSTEM PREREQUISITES
+
+---
+
+Before installing the "Software," you need the "Tools":
+
+- **Microsoft Visual Studio Build Tools**: Download the "Visual Studio
+  Community" or just the "Build Tools" from the Microsoft website. When
+  installing, make sure to check the box: [x] "Desktop development with C++"
+
+- **WebView2**: Tauri uses the Microsoft Edge engine. Most modern Windows 10/11
+  computers already have this, but if yours is missing, you can download the
+  "Evergreen Bootstrapper" from Microsoft.
+
+---
+
+2. INSTALL THE TAURI CLI
+
+---
+
+Since you have Cargo (Rust's package manager), the easiest way to install the
+Tauri command line tool is via your terminal:
+
+```powershell
+cargo install tauri-cli --version "^2.0.0"
+```
+
+---
+
+3. INITIALIZING TAURI IN THIS PROJECT
+
+---
+
+Once the CLI is installed, you can "Taurify" your project by running this
+command in your main folder:
+
+```powershell
+cargo tauri init
+```
+
+**It will ask you a few questions:**
+
+- What is your app name? -> `my-school-app`
+- What is your window title? -> `Sovereign Academy`
+- Where are your web assets? -> `http://localhost:5175` (Your Deno dev server)
+- What is your dev command? -> `deno task dev`
+
+---
+
+4. RUNNING YOUR APP
+
+---
+
+Once the setup is done, you simply run:
+
+```powershell
+cargo tauri dev
+```
+
+Windows will then open a real, native window and display your Fresh website
+inside it!
+
+---
+
+SUMMARY:
+
+1. Install C++ Build Tools (Microsoft).
+2. `cargo install tauri-cli`.
+3. `cargo tauri init`.
+4. `cargo tauri dev`.
+
+# It's that simple! Tauri will manage the connection between your Deno server and the Windows Operating System automatically.
